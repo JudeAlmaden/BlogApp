@@ -95,9 +95,10 @@ class UserController extends Controller{
     }
 
     function endSession(){
-        session_unset();
-        
-        header('Location: index.php');
-        return;
+        session_destroy();
+
+        header('location:login');
+        echo("Hello");
+        exit;
     }
 }

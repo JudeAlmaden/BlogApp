@@ -10,7 +10,7 @@ class Controller {
     public function view($path, $data = []) {
         // Convert array keys to variables for use in the view
         extract($data);
-        $base_url = "http://localhost/IntegrativeProgramming/finals/ToDoMVC";
+        $base_url = "http://localhost/IntegrativeProgramming/finals/BlogWebApp";
 
         // Path to the view file
         $viewPath = __DIR__."/../Views/" . $path . ".php";

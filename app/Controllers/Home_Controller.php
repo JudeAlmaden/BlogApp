@@ -11,6 +11,10 @@ class HomeController extends Controller{
     public function createBlogFrom(){
         $this->view('pages/create_post');
     }
+
+    public function getPostList(){
+        $this->view('pages/posts_list');
+    }
 }
 
 ?>

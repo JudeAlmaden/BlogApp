@@ -41,6 +41,25 @@ class TagsModel {
 
     // Fetch all results as an associative array
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+  }
+
+  public function insertBlogPostTags($blogPostId, $tagId) {
+    try {
+        $conn = $this->connect();
+        
+        // Prepare the SQL query to insert a new record into the pivot table 'post_tags'
+        $query = "INSERT INTO blog_post_tags (blog_post_id, tag_id) VALUES (:blog_post_id, :tag_id)";
+        $stmt = $conn->prepare($query);
+
+        // Bind the parameters and execute the statement
+        $stmt->execute([
+            ':blog_post_id' => $blogPostId,
+            ':tag_id' => $tagId,
+        ]);
+
+    } catch (PDOException $e) {
+        echo "Error associating tag with post: " . $e->getMessage();
+    }
+  }
 
 }

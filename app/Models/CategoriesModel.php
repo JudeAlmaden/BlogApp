@@ -43,6 +43,25 @@ class CategoriesModel {
 
     // Fetch all results as an associative array
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+  }
 
+  public function insertBlogPostCategories($blog_post_id, $categoryId) {
+    try {
+        $conn = $this->connect();
+        
+        // Prepare the SQL query to insert a new record into the pivot table 'post_tags'
+        $query = "INSERT INTO blog_post_category (blog_post_id, category_id) VALUES (:blog_post_id, :categoryId)";
+        $stmt = $conn->prepare($query);
+
+        // Bind the parameters and execute the statement
+        $stmt->execute([
+            ':blog_post_id' => $blog_post_id,
+            ':categoryId' => $categoryId,
+        ]);
+
+        echo "Tag successfully associated with the blog post!";
+    } catch (PDOException $e) {
+        echo "Error associating tag with post: " . $e->getMessage();
+    }
+  }
 }

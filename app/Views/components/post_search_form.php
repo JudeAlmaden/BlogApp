@@ -1,20 +1,18 @@
-<div class="container py-5">
-    <h1 class="text-center mb-4">Create Blog Post</h1>
-    <form id="category-form" action="create-post" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
-        <!-- Title Field -->
-        <div class="mb-4">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter post title" required>
-        </div>
 
-        <!-- Content Field -->
-        <div class="mb-4">
-            <label for="content" class="form-label">Content</label>
-            <textarea class="form-control" id="content" name="content" rows="6" placeholder="Write your content here..." required></textarea>
-        </div>
+<!-- Sidebar Column -->
+<div class="col-md-3">
+    <div class="card p-4 shadow-sm">
+        <h4 class="mb-4">Search Blog Posts</h4>
+        <form id="search-form" action="search-posts" method="GET">
+            
+            <!-- Keyword Search Field -->
+            <div class="mb-4">
+                <label for="keyword" class="form-label">Keyword</label>
+                <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Enter keywords" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>">
+            </div>
 
-        <!-- Category Selection -->
-        <div class="mb-4">
+            <!-- Category Filter -->
+            <div class="mb-4">
             <label for="category-search" class="form-label">Category</label>
             <input type="text" class="form-control" id="category-search" placeholder="Search for a category" autocomplete="off">
             <ul id="category-list" class="list-group mt-2"></ul>
@@ -28,46 +26,37 @@
         <div class="mb-4">
             <label for="tags-search" class="form-label">Tags</label>
             <input type="text" class="form-control" id="tags-search" placeholder="Search for a tag" autocomplete="off">
-            <ul id="tag-list" class="list-group mt-2"></ul>
-            <div class="mt-1" style="font-size:10px"></div>
+            <ul id="tag-list" class="list-group" style="font-size:40"></ul>
+            <div class="mt-1" style="font-size:10px">
                 <span class="fw-bold">Selected Tags:</span>
                 <div id="tags-list" class="mt-2"></div>
             </div>
         </div>
 
-        <!-- Media Upload -->
+        <div class="col-12 px-5"><hr></div>
+
+        <!-- Date Range Filter -->
         <div class="mb-4">
-            <label for="media" class="form-label">Upload Media</label>
-            <input type="file" class="form-control" id="media" name="media[]" accept="image/*,video/*,audio/*" multiple>
-            <small class="text-muted">You can upload images, videos, or audio files.</small>
-            <div id="media-preview" class="row mt-3 gy-3">
-                <!-- Previews will appear here -->
+            <label for="date-from" class="form-label">Date Range</label>
+            <div class="d-flex gap-2 flex-wrap">
+                <input type="date" class="form-control flex-grow-1 " id="date-from" name="date_from" value="<?php echo isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from']) : ''; ?>">
+                <span class="text-center d-flex align-items-center text-center col-xs-12">to</span>
+                <input type="date" class="form-control flex-grow-1 " id="date-to" name="date_to" value="<?php echo isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to']) : ''; ?>">
             </div>
         </div>
 
-        <!-- Scheduled Date for Publication -->
-        <div class="mb-4">
-            <label for="scheduled_at" class="form-label">Schedule for Publication</label>
-            <input type="datetime-local" class="form-control" id="scheduled_at" name="scheduled_at">
-        </div>
-
-        <!-- Hidden Fields -->
         <div id="selected-categories-tags">
             <input type="hidden" name="categories[]" id="categories-input">
             <input type="hidden" name="tags[]" id="tags-input">
         </div>
 
-        <!-- Submit Buttons -->
-        <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-primary" name="action" value="save">Save Post</button>
-            <button type="submit" class="btn btn-success" name="action" value="publish">Publish Post</button>
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" id="search-btn">Search</button>
         </div>
-    </form>
+        </form>
+    </div>
 </div>
-
-<!-- jQuery and FontAwesome for "X" icon -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <script>
 $(document).ready(function() {
@@ -83,7 +72,6 @@ $(document).ready(function() {
             $('#category-list').empty();
         }
     });
-
 
     function searchCategories(query) {
         $('#category-list').empty();
@@ -111,7 +99,6 @@ $(document).ready(function() {
         });
     }
 
-
     function addCategoryToList(category) {
         if (!categories.some(cat => cat.id === category.id)) {
             categories.push({ id: category.id, name: category.name });
@@ -119,7 +106,6 @@ $(document).ready(function() {
         updateSelectedCategories();
     }
 
-  
     function updateSelectedCategories() {
         $('#categories-list').empty();
         categories.forEach(function(category) {
@@ -205,57 +191,32 @@ $(document).ready(function() {
         $('#tags-input').val(JSON.stringify(tags)); // Update the hidden input with selected tags
     }
 
-    // Remove tag from the list
     function removeTagFromList(tag) {
         tags = tags.filter(t => t.id !== tag.id);
         updateSelectedTags();
         console.log(tags)
     }
-});
-</script>
 
-<script>
-    document.getElementById('media').addEventListener('change', function () {
-        const previewContainer = document.getElementById('media-preview');
-        previewContainer.innerHTML = ''; // Clear existing previews
 
-        const files = Array.from(this.files);
-        files.forEach(file => {
-            const reader = new FileReader();
-            const fileType = file.type.split('/')[0]; // Check if it's image, video, or audio
-
-            reader.onload = function (event) {
-                const colDiv = document.createElement('div');
-                colDiv.classList.add('col-4', 'text-center');
-
-                if (fileType === 'image') {
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    img.alt = file.name;
-                    img.classList.add('img-fluid', 'rounded', 'shadow');
-                    colDiv.appendChild(img);
-                } else if (fileType === 'video') {
-                    const video = document.createElement('video');
-                    video.src = event.target.result;
-                    video.controls = true;
-                    video.classList.add('w-100', 'rounded', 'shadow');
-                    colDiv.appendChild(video);
-                } else if (fileType === 'audio') {
-                    const audio = document.createElement('audio');
-                    audio.src = event.target.result;
-                    audio.controls = true;
-                    audio.classList.add('w-100', 'rounded', 'shadow');
-                    colDiv.appendChild(audio);
-                } else {
-                    const fileName = document.createElement('p');
-                    fileName.textContent = `Unsupported file: ${file.name}`;
-                    colDiv.appendChild(fileName);
-                }
-
-                previewContainer.appendChild(colDiv);
-            };
-
-            reader.readAsDataURL(file); // Read file as Data URL for preview
+    // Handle the search form submission with AJAX
+    $('#search-btn').on('click', function() {
+        var formData = $('#search-form').serialize(); // Get the form data
+        
+        // Send AJAX request
+        $.ajax({
+            url: $('#search-form').attr('action'), // Form's action URL
+            method: 'GET',
+            data: formData,
+            success: function(response) {
+                // Handle the successful response
+                console.log(response); // You can display the results in the UI or handle it as needed
+                // Example: $('#results-container').html(response); // Update the results container
+            },
+            error: function(xhr, status, error) {
+                // Handle the error response
+                alert('An error occurred: ' + error);
+            }
         });
     });
+});
 </script>

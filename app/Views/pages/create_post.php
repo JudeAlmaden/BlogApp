@@ -23,7 +23,7 @@
 </head>
 
 <body>
-<div class="container mt-5">
+<div class="container-fluid">
     <?php require_once(__DIR__."/../components/navbar.php");?>
     <?php require_once(__DIR__."/../components/blogpost_form.php");?>
     <?php require_once(__DIR__ . "/../view_error.php"); ?>

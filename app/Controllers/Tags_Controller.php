@@ -2,6 +2,7 @@
 
 require_once("Controller.php");
 require_once(__DIR__."/../Models/TagsModel.php");
+
 class TagsController extends Controller{
 
     public function getAll() {        
