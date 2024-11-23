@@ -59,7 +59,6 @@ class CategoriesModel {
             ':categoryId' => $categoryId,
         ]);
 
-        echo "Tag successfully associated with the blog post!";
     } catch (PDOException $e) {
         echo "Error associating tag with post: " . $e->getMessage();
     }

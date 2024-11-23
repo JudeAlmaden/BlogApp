@@ -57,20 +57,23 @@ class BlogController extends Controller{
     
             // 2. Handle File Uploads
             $media_files = [];
+            $errors = [];
+            
             if (!empty($_FILES['media']['name'][0])) {
-                $media_dir = __DIR__ . '/../../public/uploads/media/';
+                // Define the relative path for media uploads
+                $media_dir = 'public/uploads/media';
                 
-                // Create directory if it doesn't exist
+                // Create the directory if it doesn't exist
                 if (!is_dir($media_dir)) {
                     mkdir($media_dir, 0777, true);
                 }
             
-                // Initialize fileinfo resource
+                // Initialize fileinfo resource for MIME type detection
                 $finfo = finfo_open(FILEINFO_MIME_TYPE); // Open fileinfo resource for MIME type detection
-                
+            
                 foreach ($_FILES['media']['tmp_name'] as $key => $tmp_name) {
                     $file_name = basename($_FILES['media']['name'][$key]);
-                    
+            
                     // Use finfo_file to get the MIME type
                     $file_type = finfo_file($finfo, $tmp_name);
             
@@ -96,11 +99,17 @@ class BlogController extends Controller{
             
                     // Check if the MIME type is valid
                     if (in_array($file_type, $allowed_types)) {
-                        $target_path = $media_dir . uniqid() . '_' . $file_name;
+                        // Generate a relative file path for the uploaded file
+                        $relative_file_path = 'uploads/media/' . uniqid() . '_' . $file_name;
+            
+                        // Set the target path as the absolute file system path for saving
+                        $target_path = $media_dir . basename($relative_file_path);
+            
+                        // Move the uploaded file to the server
                         if (move_uploaded_file($tmp_name, $target_path)) {
-                            // Store both the file path and mapped type
+                            // Store the relative file path and mapped type for the uploaded file
                             $media_files[] = [
-                                'path' => $target_path,
+                                'path' => $relative_file_path, // Use the relative path here
                                 'type' => $mapped_type // Insert the mapped type here
                             ];
                         } else {
@@ -114,6 +123,7 @@ class BlogController extends Controller{
                 // Close fileinfo resource after use
                 finfo_close($finfo);
             }
+            
             
             // If errors exist, return to form with errors
             if (!empty($errors)) {
@@ -146,5 +156,33 @@ class BlogController extends Controller{
             }
         }
     }
+
+    public function search() {
+        $keyword = isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword'], ENT_QUOTES) : '';
+        $date_from = isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from'], ENT_QUOTES) : '';
+        $date_to = isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to'], ENT_QUOTES) : '';
+        $tags = isset($_GET['tags'][0]) ? json_decode($_GET['tags'][0], true) : [];
+        $categories = isset($_GET['categories'][0]) ? json_decode($_GET['categories'][0], true) : [];      
+        $offset = isset($_GET['offset']) ? htmlspecialchars($_GET['offset'], ENT_QUOTES) : '';
+        
+        $blogsModel = new BlogModel();
+        $results = $blogsModel->Search($keyword, $categories, $tags, $date_from, $date_to, $offset);
+    
+        header('Content-Type: application/json');
+    
+
+        // $response = [
+        //     'keyword' => $keyword,
+        //     'date_from' => $date_from,
+        //     'date_to' => $date_to,
+        //     'categories' => $categories,
+        //     'tags' => $tags
+        // ];
+        // echo json_encode($response);  // Return a specific error message in JSON format
+
+        echo json_encode($results);  // Send results as JSON
+
+    }
+    
 }
 ?>

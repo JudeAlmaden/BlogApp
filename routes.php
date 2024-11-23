@@ -33,6 +33,7 @@ $router->addRoute('/posts', 'HomeController', 'getPostList', 'GET');
 //API ROUTES
 $router->addRoute('/api/get/tags/search', 'TagsController', 'search', 'GET');
 $router->addRoute('/api/get/categories/search', 'CategoriesController', 'search', 'GET');
+$router->addRoute('/api/get/search-posts', 'BlogController', 'search', 'GET');
 
 //Logout
 $router->addRoute('/logout', 'UserController', 'endSession', 'GET');

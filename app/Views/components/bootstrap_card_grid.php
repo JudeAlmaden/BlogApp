@@ -51,15 +51,5 @@
         </div>
       </div>
     </div>
-    <div class="col">
-      <div class="card">
-        <img src="https://www.typingpal.com/user/pages/04.nouvelles/lorem-ipsum-le-texte-factice-par-excellence/lorem-ipsum@2x.png" class="card-img-top" alt="Post Image">
-        <div class="card-body">
-          <h5 class="card-title">View Latest Blogpost</h5>
-          <p class="card-text">Checkout the latest post from our 1 user!</p>
-          <a href="#" class="btn btn-primary">Click Here</a>
-        </div>
-      </div>
-    </div>
   </div>
 </div>

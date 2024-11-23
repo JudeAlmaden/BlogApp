@@ -1,9 +1,9 @@
 
 <!-- Sidebar Column -->
-<div class="col-md-3">
+<div class="col-md-3 mb-5">
     <div class="card p-4 shadow-sm">
         <h4 class="mb-4">Search Blog Posts</h4>
-        <form id="search-form" action="search-posts" method="GET">
+        <form id="search-form" action="api/get/search-posts" method="GET">
             
             <!-- Keyword Search Field -->
             <div class="mb-4">
@@ -59,12 +59,14 @@
 </div>
 
 <script>
-$(document).ready(function() {
-    let categories = [];  // Array to store selected categories
-    let tags = [];  // Array to store selected tags
+$(document).ready(function () {
+    let categories = []; // Array to store selected categories
+    let tags = []; // Array to store selected tags
+    let offset = 0;
+    let reachedEnd = false;
 
     // Listen for input events to search for categories
-    $('#category-search').on('input', function() {
+    $('#category-search').on('input', function () {
         const query = $(this).val();
         if (query.length >= 1) {
             searchCategories(query);
@@ -79,110 +81,107 @@ $(document).ready(function() {
             url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/categories/search?search=' + query,
             method: 'GET',
             dataType: 'json',
-            success: function(data) {
-                data.forEach(function(category) {
+            success: function (data) {
+                data.forEach(function (category) {
                     const listItem = $('<li>')
                         .addClass('list-group-item list-group-item-action')
                         .text(category.name)
-                        .data('id', category.id)
-                        .on('click', function() {
+                        .on('click', function () {
                             $('#category-list').empty();
-                            addCategoryToList(category);
+                            addCategoryToList(category.name);
                             $('#category-search').val('');
                         });
                     $('#category-list').append(listItem);
                 });
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error fetching categories:', error);
             }
         });
     }
 
-    function addCategoryToList(category) {
-        if (!categories.some(cat => cat.id === category.id)) {
-            categories.push({ id: category.id, name: category.name });
+    function addCategoryToList(categoryName) {
+        if (!categories.includes(categoryName)) {
+            categories.push(categoryName);
         }
         updateSelectedCategories();
     }
 
     function updateSelectedCategories() {
         $('#categories-list').empty();
-        categories.forEach(function(category) {
+        categories.forEach(function (category) {
             const box = $('<span>')
                 .addClass('badge bg-light p-2 m-1 text-dark rounded-pill border border-secondary')
-                .text(category.name)
+                .text(category)
                 .append(
                     $('<i>')
                         .addClass('ms-1 fa-solid fa-x')
-                        .on('click', function() {
+                        .on('click', function () {
                             removeCategoryFromList(category);
                         })
                 );
             $('#categories-list').append(box);
         });
-        $('#categories-input').val(JSON.stringify(categories)); 
+        $('#categories-input').val(JSON.stringify(categories)); // Update the hidden input with selected categories
     }
 
-    function removeCategoryFromList(category) {
-        categories = categories.filter(cat => cat.id !== category.id);
+    function removeCategoryFromList(categoryName) {
+        categories = categories.filter(cat => cat !== categoryName);
         updateSelectedCategories();
     }
 
-    //Tags
-    $('#tags-search').on('input', function() {
+    // Tags
+    $('#tags-search').on('input', function () {
         const query = $(this).val();
         if (query.length >= 1) {
             searchTags(query);
         } else {
-            $('#tags-list').empty();
+            $('#tag-list').empty();
         }
     });
 
     function searchTags(query) {
-        $('#tags-list').empty();
+        $('#tag-list').empty();
         $.ajax({
             url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/tags/search?search=' + query,
             method: 'GET',
             dataType: 'json',
-            success: function(data) {
-                data.forEach(function(tag) {
+            success: function (data) {
+                data.forEach(function (tag) {
                     const listItem = $('<li>')
                         .addClass('list-group-item list-group-item-action')
                         .text(tag.name)
-                        .data('id', tag.id)
-                        .on('click', function() {
+                        .on('click', function () {
                             $('#tag-list').empty();
-                            addTagToList(tag);
+                            addTagToList(tag.name);
                             $('#tags-search').val('');
                         });
                     $('#tag-list').append(listItem);
                 });
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error fetching tags:', error);
             }
         });
     }
 
-    function addTagToList(tag) {
-        if (!tags.some(t => t.id === tag.id)) {
-            tags.push({ id: tag.id, name: tag.name });
+    function addTagToList(tagName) {
+        if (!tags.includes(tagName)) {
+            tags.push(tagName);
         }
         updateSelectedTags();
     }
 
     function updateSelectedTags() {
         $('#tags-list').empty();
-
-        tags.forEach(function(tag) {
+        tags.forEach(function (tag) {
             const box = $('<span>')
                 .addClass('badge bg-light p-2 m-1 text-dark rounded-pill border border-secondary')
-                .text(tag.name)
+                .text(tag)
                 .append(
                     $('<i>')
                         .addClass('ms-1 fa-solid fa-x')
-                        .on('click', function() {
+                        .on('click', function () {
                             removeTagFromList(tag);
                         })
                 );
@@ -191,32 +190,107 @@ $(document).ready(function() {
         $('#tags-input').val(JSON.stringify(tags)); // Update the hidden input with selected tags
     }
 
-    function removeTagFromList(tag) {
-        tags = tags.filter(t => t.id !== tag.id);
+    function removeTagFromList(tagName) {
+        tags = tags.filter(t => t !== tagName);
         updateSelectedTags();
-        console.log(tags)
     }
 
+    // Reusable AJAX query function
+    function fetchSearchResults() {
+        const formData = $('#search-form').serialize() + `&offset=${offset}`; // Include offset in the form data
 
-    // Handle the search form submission with AJAX
-    $('#search-btn').on('click', function() {
-        var formData = $('#search-form').serialize(); // Get the form data
-        
-        // Send AJAX request
-        $.ajax({
-            url: $('#search-form').attr('action'), // Form's action URL
-            method: 'GET',
-            data: formData,
-            success: function(response) {
-                // Handle the successful response
-                console.log(response); // You can display the results in the UI or handle it as needed
-                // Example: $('#results-container').html(response); // Update the results container
-            },
-            error: function(xhr, status, error) {
-                // Handle the error response
-                alert('An error occurred: ' + error);
-            }
-        });
+        if (!reachedEnd) {
+        // Add the spinner to the end of the results
+        const spinner = `
+            <div class="d-flex justify-content-center my-4" id="search-spinner">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        `;
+
+        $('#results').append(spinner); // Append spinner to results
+
+            $.ajax({
+                url: $('#search-form').attr('action'), // Form's action URL
+                method: 'GET',
+                data: formData,
+                complete: function () {
+                    // Remove spinner when AJAX completes, regardless of success or error
+                    $('#search-spinner').remove();
+                },
+                success: function (response) {
+                    const data = response;
+
+                    if (data.length === 0) {
+                        const resultCard = `
+                            <div class="my-3 mb-2 fs-4 text-center">
+                                Seems like that's everything
+                            </div>`;
+                        $('#results').append(resultCard);
+
+                        reachedEnd = true; // Mark as end reached
+                        return;
+                    }
+
+                    // Populate results
+                    data.forEach(function (item) {
+                        const imagePath = item.file_path
+                            ? "http://localhost/IntegrativeProgramming/finals/BlogWebApp/public/" + item.file_path
+                            : 'https://picsum.photos/600/300'; // Default image if file_path is empty
+                        
+                            const resultCard = `
+                                <div class="card mb-3 d-flex flex-align-center mb-2">
+                                    <div class="row g-0">
+                                        <div class="col-md-4">
+                                            <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 200px; object-fit: cover;">
+                                        </div>
+                                        <div class="col-md-8"  style="height: 200px; ">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${item.title}</h5>
+                                                <p class="card-text">${item.content.length > 30 ? item.content.substring(0, 200) + '...' : item.content}</p>
+                                                <p class="card-text"><small class="text-muted">Last updated: ${item.updated_at}</small></p>
+                                                <p class="card-text my-0"><small>Tags: ${item.all_tags}</small></p>
+                                                <p class="card-text my-0"><small>Categories: ${item.all_categories}</small></p>
+                                                <div class="d-flex justify-content-end">
+                                                    <a href="view/${item.id}" class="btn btn-primary col-3" target="_blank" rel="noopener noreferrer">Read</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                        
+                        $('#results').append(resultCard);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        }
+    }
+
+    // Fetch results on page load
+    fetchSearchResults();
+
+    // Fetch results when search button is clicked
+    $('#search-btn').on('click', function () {
+        reachedEnd = false;
+        offset = 0
+
+        $('#results').empty();
+        fetchSearchResults();
+    });
+
+    //More when document reaches end
+    $(window).on('scroll', function () {
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+        offset += 1;
+        fetchSearchResults();
+        }
     });
 });
+
+
 </script>

@@ -31,8 +31,7 @@
             <ul id="tag-list" class="list-group mt-2"></ul>
             <div class="mt-1" style="font-size:10px"></div>
                 <span class="fw-bold">Selected Tags:</span>
-                <div id="tags-list" class="mt-2"></div>
-            </div>
+            <div id="tags-list" class="mt-2"></div>
         </div>
 
         <!-- Media Upload -->
@@ -79,6 +78,7 @@ $(document).ready(function() {
         const query = $(this).val();
         if (query.length >= 1) {
             searchCategories(query);
+            
         } else {
             $('#category-list').empty();
         }
@@ -149,12 +149,12 @@ $(document).ready(function() {
         if (query.length >= 1) {
             searchTags(query);
         } else {
-            $('#tags-list').empty();
+            $('#tag-list').empty();
         }
     });
 
     function searchTags(query) {
-        $('#tags-list').empty();
+        $('#tag-list').empty();
         $.ajax({
             url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/tags/search?search=' + query,
             method: 'GET',
