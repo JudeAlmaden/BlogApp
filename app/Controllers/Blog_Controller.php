@@ -164,25 +164,47 @@ class BlogController extends Controller{
         $tags = isset($_GET['tags'][0]) ? json_decode($_GET['tags'][0], true) : [];
         $categories = isset($_GET['categories'][0]) ? json_decode($_GET['categories'][0], true) : [];      
         $offset = isset($_GET['offset']) ? htmlspecialchars($_GET['offset'], ENT_QUOTES) : '';
-        
+        // Default sorting options
+        $defaultSortBy = 'date'; // Default column to sort by
+        $defaultSortOrder = 'desc'; // Default sorting order
+
+        // Retrieve and sanitize input
+        $sortBy = isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by'], ENT_QUOTES) : $defaultSortBy;
+        $sortOrder = isset($_GET['sort_order']) ? htmlspecialchars($_GET['sort_order'], ENT_QUOTES) : $defaultSortOrder;
+
+        // Validate 'sort_by' (must be either 'date' or 'likes')
+        $validSortByOptions = ['date', 'likes'];
+        if (!in_array($sortBy, $validSortByOptions)) {
+            $sortBy = $defaultSortBy; // Fallback to default if invalid
+        }
+
+        // Validate 'sort_order' (must be either 'asc' or 'desc')
+        $validSortOrderOptions = ['asc', 'desc'];
+        if (!in_array($sortOrder, $validSortOrderOptions)) {
+            $sortOrder = $defaultSortOrder; // Fallback to default if invalid
+        }
+
         $blogsModel = new BlogModel();
-        $results = $blogsModel->Search($keyword, $categories, $tags, $date_from, $date_to, $offset);
+        $results = $blogsModel->Search($keyword, $categories, $tags, $date_from, $date_to, $offset,$sortBy,$sortOrder);
     
         header('Content-Type: application/json');
-    
-
-        // $response = [
-        //     'keyword' => $keyword,
-        //     'date_from' => $date_from,
-        //     'date_to' => $date_to,
-        //     'categories' => $categories,
-        //     'tags' => $tags
-        // ];
-        // echo json_encode($response);  // Return a specific error message in JSON format
-
         echo json_encode($results);  // Send results as JSON
-
     }
     
+    
+    public function readPost() {
+        $id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
+
+        // Check if $id is numeric and not empty
+        if (empty($id) || !is_numeric($id)) {
+            // Redirect to a fallback page if the condition is not met
+            header("location:posts"); // Update the URL to your desired fallback page
+            exit();
+        }
+        
+        $blogsModel = new BlogModel();
+        $results = $blogsModel->getById($id);
+        $this->view('pages/blog_view',['results'=>$results]);
+    }
 }
 ?>

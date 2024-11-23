@@ -33,7 +33,6 @@ if (!isset($_SESSION['id'])) {
 
     <div class="col-12 mb-5 row">
         <?php require_once(__DIR__."/../components/post_search_form.php"); ?>
-        <?php require_once(__DIR__."/../components/post_search_results.php"); ?>
     </div>
 
     <!-- Footer -->

@@ -45,9 +45,10 @@ class BlogModel {
   }
 
 
-  public function Search($keyword = "%", $categories, $tags, $date_from, $date_to, $offset = 0,$limit = 20) {
+  public function Search($keyword = "%", $categories, $tags, $date_from, $date_to, $offset = 0, $sortBy = "date", $sortOrder = "desc", $limit = 20) {
     $conn = $this->connect();
     $offset = $offset * $limit;
+
     // Base query
     $query = "
         SELECT 
@@ -121,6 +122,24 @@ class BlogModel {
     // Add GROUP BY clause
     $query .= " GROUP BY blog_posts.id";
 
+    // Validate sortBy and sortOrder
+    $validSortByOptions = ['date', 'likes', 'updated'];
+    $validSortOrderOptions = ['asc', 'desc'];
+
+    if (!in_array($sortBy, $validSortByOptions)) {
+        $sortBy = 'date';
+    }
+
+    if (!in_array($sortOrder, $validSortOrderOptions)) {
+        $sortOrder = 'desc';
+    }
+
+    // Map sortBy to corresponding column
+    $sortColumn = $sortBy === 'date' ? 'blog_posts.created_at' : ($sortBy === 'updated' ? 'blog_posts.updated_at' : 'blog_posts.likes');
+
+    // Add ORDER BY clause
+    $query .= " ORDER BY $sortColumn $sortOrder";
+
     // Add LIMIT and OFFSET for pagination
     $query .= " LIMIT $limit OFFSET $offset";
 
@@ -134,7 +153,59 @@ class BlogModel {
     } else {
         return ["error" => "Query preparation failed."];
     }
-}
+    }
+
+
+    public function getById($id) {
+        $conn = $this->connect();
+
+        $query = "
+        SELECT 
+            blog_posts.*,
+            users.name as author,
+            GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name) AS all_tags,
+            GROUP_CONCAT(DISTINCT categories.name ORDER BY categories.name) AS all_categories,
+            GROUP_CONCAT(DISTINCT blog_post_media.file_Path ORDER BY blog_post_media.id) as image_url
+        FROM 
+            blog_posts
+        LEFT JOIN 
+            blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+        LEFT JOIN 
+            tags ON tags.id = blog_post_tags.tag_id
+        LEFT JOIN 
+            blog_post_category ON blog_posts.id = blog_post_category.blog_post_id
+        LEFT JOIN 
+            categories ON categories.id = blog_post_category.category_id
+        LEFT JOIN
+            blog_post_media on blog_posts.id = blog_post_media.blog_post_id
+        LEFT JOIN
+            users on blog_posts.user_id = users.id
+        WHERE 
+            (blog_posts.status = 'published'
+            OR (blog_posts.scheduled_at > '0000-00-00 00:00:00' AND blog_posts.scheduled_at < NOW()))
+            AND blog_posts.id = ?
+        GROUP BY 
+            blog_posts.id";
+
+        // Prepare the query
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            return ["error" => "Query preparation failed."];
+        }
+
+        // Bind the ID parameter and execute the query
+        $stmt->execute([$id]);
+
+        // Fetch the result
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Check if the blog post exists
+        if ($result) {
+            return $result;
+        } else {
+            return ["error" => "Blog post not found."];
+        }
+    }
 
 
 }

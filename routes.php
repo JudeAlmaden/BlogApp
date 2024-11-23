@@ -28,7 +28,9 @@ $router->addRoute('/create-post', 'HomeController', 'createBlogFrom', 'GET');
 $router->addRoute('/create-post', 'BlogController', 'createBlogPost', 'POST');
 
 //Posts
-$router->addRoute('/posts', 'HomeController', 'getPostList', 'GET');
+$router->addRoute('/posts', 'HomeController', 'getPostList', 'GET');    //Just a route for view, Uses API route for Blog Controller to actually display
+$router->addRoute('/view', 'BlogController', 'readPost', 'GET');
+
 
 //API ROUTES
 $router->addRoute('/api/get/tags/search', 'TagsController', 'search', 'GET');

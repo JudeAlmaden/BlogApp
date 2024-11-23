@@ -50,12 +50,37 @@
             <input type="hidden" name="tags[]" id="tags-input">
         </div>
 
+        <div class="col-12 px-5"><hr></div>
+
+        <div class="mb-3">
+            <div class="form-group">
+                <label for="sort-by" class="form-label">Sort By:</label>
+                <select id="sort-by" name="sort_by" class="form-control">
+                    <option value="date">Date</option>
+                    <option value="likes">Likes</option>
+                </select>
+            </div>
+
+            <div class="form-group mt-2">
+                <label for="sort-order" class="form-label">Order:</label>
+                <select id="sort-order" name="sort_order" class="form-control">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </div>
+        </div>
+        
         <!-- Submit Button -->
         <div class="d-flex justify-content-end">
             <button type="button" class="btn btn-primary" id="search-btn">Search</button>
         </div>
         </form>
     </div>
+</div>
+
+<!-- Results -->
+<div class="col"  id="results">
+
 </div>
 
 <script>
@@ -243,17 +268,18 @@ $(document).ready(function () {
                                 <div class="card mb-3 d-flex flex-align-center mb-2">
                                     <div class="row g-0">
                                         <div class="col-md-4">
-                                            <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 200px; object-fit: cover;">
+                                            <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 230px; object-fit: cover;">
                                         </div>
-                                        <div class="col-md-8"  style="height: 200px; ">
+                                        <div class="col-md-8"  style="height: 230px; ">
                                             <div class="card-body">
                                                 <h5 class="card-title">${item.title}</h5>
                                                 <p class="card-text">${item.content.length > 30 ? item.content.substring(0, 200) + '...' : item.content}</p>
-                                                <p class="card-text"><small class="text-muted">Last updated: ${item.updated_at}</small></p>
+                                                <p class="card-text m-0"><small class="text-muted">Last updated: ${item.updated_at}</small></p>
+                                                <p class="card-text m-0"><small>Likes: ${item.likes}</small></p>
                                                 <p class="card-text my-0"><small>Tags: ${item.all_tags}</small></p>
                                                 <p class="card-text my-0"><small>Categories: ${item.all_categories}</small></p>
                                                 <div class="d-flex justify-content-end">
-                                                    <a href="view/${item.id}" class="btn btn-primary col-3" target="_blank" rel="noopener noreferrer">Read</a>
+                                                    <a href="view?id=${item.id}" class="btn btn-primary col-3" target="_blank" rel="noopener noreferrer">Read</a>
                                                 </div>
                                             </div>
                                         </div>
