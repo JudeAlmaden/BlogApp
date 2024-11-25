@@ -45,18 +45,18 @@
             </div>
 
             <!-- Images -->
-            <?php if (!empty($results['image_url'])): ?>
+            <?php if (!empty($results['media_url'])): ?>
             <!-- Carousel Container -->
-            <div id="imageCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div id="imageCarousel" class="carousel carousel-dark slide mb-4" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php
-                        $images = explode(',', $results['image_url']);
+                        $images = explode(',', $results['media_url']);
                         $first = true; // To handle the first image active class
                         foreach ($images as $image): 
                     ?>
                         <div class="carousel-item <?php echo $first ? 'active' : ''; ?>">
                             <!-- Image Thumbnail with height limit of 400px and centered -->
-                            <img src="http://localhost/IntegrativeProgramming/finals/BlogWebApp/public/<?php echo htmlspecialchars($image); ?>" 
+                            <img src="<?php echo htmlspecialchars($image); ?>" 
                                 class="d-block w-100 img-fluid rounded mb-3 thumbnail-image" 
                                 alt="Image"
                                 data-bs-toggle="modal" 

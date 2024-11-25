@@ -62,4 +62,21 @@ class TagsModel {
     }
   }
 
+  public function deleteByBlogId($id){
+    try {
+      $conn = $this->connect();
+      
+      // Prepare the SQL query to insert a new record into the pivot table 'post_tags'
+      $query = "DELETE FROM  blog_post_tag WHERE blog_post_id = :id";
+      $stmt = $conn->prepare($query);
+
+      // Bind the parameters and execute the statement
+      $stmt->execute([
+          ':id' => $id
+      ]);
+
+  } catch (PDOException $e) {
+      echo "Error associating tag with post: " . $e->getMessage();
+  }
+}
 }

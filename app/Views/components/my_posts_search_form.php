@@ -1,9 +1,10 @@
 
 <!-- Sidebar Column -->
+<div class="col-12 mb-5 row">
 <div class="col-md-3 mb-5">
-    <div class="card p-4 shadow-sm">
-        <h4 class="mb-4">Search Blog Posts</h4>
-        <form id="search-form" action="api/get/search-posts" method="GET">
+    <div class="card p-4 shadow-sm" >
+        <h4 class="mb-4"> Filters</h4>
+        <form id="search-form" action="api/get/my-posts/search" method="GET">
             
             <!-- Keyword Search Field -->
             <div class="mb-4">
@@ -68,6 +69,16 @@
                     <option value="asc">Ascending</option>
                 </select>
             </div>
+
+            
+            <div class="form-group mt-2">
+                <label for="sort-order" class="form-label">Status:</label>
+                <select id="sort-order" name="status" class="form-control">
+                    <option value="">Any</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Published">Published</option>
+                </select>
+            </div>
         </div>
         
         <!-- Submit Button -->
@@ -77,10 +88,11 @@
         </form>
     </div>
 </div>
-
-<!-- Results -->
-<div class="col"  id="results">
-
+    <div class="col-8">
+        <h2 class="text-center">Here are your posts</h2>
+        <div class="col-12"  id="results">
+        </div>
+    </div>
 </div>
 
 <script>
@@ -89,6 +101,7 @@ $(document).ready(function () {
     let tags = []; // Array to store selected tags
     let offset = 0;
     let reachedEnd = false;
+    let isQuerying = false;
 
     // Listen for input events to search for categories
     $('#category-search').on('input', function () {
@@ -103,7 +116,7 @@ $(document).ready(function () {
     function searchCategories(query) {
         $('#category-list').empty();
         $.ajax({
-            url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/categories/search?search=' + query,
+            url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/categories?=' + query,
             method: 'GET',
             dataType: 'json',
             success: function (data) {
@@ -236,6 +249,7 @@ $(document).ready(function () {
 
         $('#results').append(spinner); // Append spinner to results
 
+        if(!isQuerying){
             $.ajax({
                 url: $('#search-form').attr('action'), // Form's action URL
                 method: 'GET',
@@ -243,6 +257,7 @@ $(document).ready(function () {
                 complete: function () {
                     // Remove spinner when AJAX completes, regardless of success or error
                     $('#search-spinner').remove();
+                    isQuerying=false;
                 },
                 success: function (response) {
                     const data = response;
@@ -261,32 +276,35 @@ $(document).ready(function () {
                     // Populate results
                     data.forEach(function (item) {
                         const imagePath = item.file_path
-                            ? "http://localhost/IntegrativeProgramming/finals/BlogWebApp/public/" + item.file_path
-                            : 'https://picsum.photos/600/300'; // Default image if file_path is empty
+                            ? item.file_path
+                            : "https://via.placeholder.com/600x250"; // Default image if file_path is empty
                         
                             const resultCard = `
-                                <div class="card mb-3 d-flex flex-align-center mb-2">
+                                <div class="card mb-3 d-flex flex-align-center mb-5">
                                     <div class="row g-0">
                                         <div class="col-md-4">
-                                            <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 230px; object-fit: cover;">
+                                            <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 250px; object-fit: cover;">
                                         </div>
-                                        <div class="col-md-8"  style="height: 230px; ">
+                                        <div class="col-md-8"  style="height: 250px; ">
                                             <div class="card-body">
-                                                <h5 class="card-title">${item.title}</h5>
-                                                <p class="card-text">${item.content.length > 30 ? item.content.substring(0, 200) + '...' : item.content}</p>
-                                                <p class="card-text m-0"><small class="text-muted">Last updated: ${item.updated_at}</small></p>
+                                                <h5 class="card-title">${item.content.length > 30 ? item.content.substring(0, 20) + '...' : item.title}</h5>
+                                                <p class="card-text">${item.content.length > 50 ? item.content.substring(0, 150) + '...' : item.content}</p>
+                                                <p class="card-text m-0"><small class="text-muted"> Last updated: ${item.updated_at}</small></p>
                                                 <p class="card-text m-0"><small>Likes: ${item.likes}</small></p>
-                                                <p class="card-text my-0"><small>Tags: ${item.all_tags}</small></p>
-                                                <p class="card-text my-0"><small>Categories: ${item.all_categories}</small></p>
+                                                <small>
+                                                    Status: 
+                                                    <span class="badge ${item.status === 'published' ? 'bg-success' : 'bg-warning text-dark'}">
+                                                        ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                                                    </span>
+                                                </small>
                                                 <div class="d-flex justify-content-end">
-                                                    <a href="view?id=${item.id}" class="btn btn-primary col-3" target="_blank" rel="noopener noreferrer">Read</a>
+                                                    <a href="delete-post?id=${item.id}" class="btn btn-danger col-3 me-1" target="_blank" rel="noopener noreferrer"><i class="fas fa-trash me-2"></i>Delete</a>
+                                                    <a href="edit-post?id=${item.id}" class="btn btn-success col-3" target="_blank" rel="noopener noreferrer"><i class="fas fa-edit me-2"></i>Edit</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>`;
-
-                        
                         $('#results').append(resultCard);
                     });
                 },
@@ -294,6 +312,7 @@ $(document).ready(function () {
                     alert('An error occurred: ' + error);
                 }
             });
+            }
         }
     }
 

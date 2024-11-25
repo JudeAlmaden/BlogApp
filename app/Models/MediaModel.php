@@ -15,7 +15,6 @@ class MediaModel {
   public function insertBlogPostMedia($blogPostId, $filePath, $fileType) {
     try {
         $conn = $this->connect();
-        
         // Prepare the SQL query to insert a new record into the 'blog_post_media' table
         $query = "INSERT INTO blog_post_media (blog_post_id, file_path, file_type, created_at, updated_at) 
                   VALUES (:blog_post_id, :file_path, :file_type, NOW(), NOW())";
@@ -32,4 +31,22 @@ class MediaModel {
         echo "Error associating media with post: " . $e->getMessage();
     }
   }
+
+  public function deleteByBlogId($id){
+    try {
+      $conn = $this->connect();
+      
+      // Prepare the SQL query to insert a new record into the pivot table 'post_tags'
+      $query = "DELETE FROM  blog_post_media WHERE blog_post_id = :id";
+      $stmt = $conn->prepare($query);
+
+      // Bind the parameters and execute the statement
+      $stmt->execute([
+          ':id' => $id
+      ]);
+
+  } catch (PDOException $e) {
+      echo "Error associating tag with post: " . $e->getMessage();
+  }
+}
 }

@@ -11,45 +11,63 @@
 
     <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <!-- Home Link -->
-        <li class="nav-item">
-          <a class="nav-link active fs-5" aria-current="page" href="homepage">Home</a>
-        </li>
-        <!-- Create Post Link -->
-        <li class="nav-item">
-          <a class="nav-link fs-5" href="create-post">Create Post</a>
-        </li>
-        <!-- See other posts -->
-        <li class="nav-item">
-          <a class="nav-link fs-5" href="posts">View Posts</a>
-        </li>
-        <!-- My Posts Link -->
-        <li class="nav-item">
-          <a class="nav-link fs-5" href="my-post">My Post</a>
-        </li>
-        <!-- About Link -->
-        <li class="nav-item">
-          <a class="nav-link fs-5" href="#">About</a>
-        </li>
-        <!-- Contact Link -->
-        <li class="nav-item">
-          <a class="nav-link fs-5" href="#">Contact</a>
-        </li>
-        <!-- User Account Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle fs-5" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Account
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="logout">Log out</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
+    <ul class="navbar-nav ms-auto">
+      <!-- Home Link -->
+      <li class="nav-item">
+        <a class="nav-link fs-5" id="home-link" href="homepage">Home</a>
+      </li>
+      <!-- Create Post Link -->
+      <li class="nav-item">
+        <a class="nav-link fs-5" id="create-post-link" href="create-post">Create Post</a>
+      </li>
+      <!-- See other posts -->
+      <li class="nav-item">
+        <a class="nav-link fs-5" id="view-posts-link" href="posts-lists">View Posts</a>
+      </li>
+      <!-- My Posts Link -->
+      <li class="nav-item">
+        <a class="nav-link fs-5" id="my-posts-link" href="my-posts">My Posts</a>
+      </li>
+      <!-- About Link -->
+      <li class="nav-item">
+        <a class="nav-link fs-5" id="about-link" href="#">About</a>
+      </li>
+      <!-- Contact Link -->
+      <li class="nav-item">
+        <a class="nav-link fs-5" id="contact-link" href="#">Contact</a>
+      </li>
+      <!-- User Account Dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle fs-5" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Account
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <li><a class="dropdown-item" href="#">Profile</a></li>
+          <li><a class="dropdown-item" href="settings">Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="logout">Log out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+<script>
+  // Get the current URL
+  const currentURL = window.location.pathname;
+
+  // Get all nav links
+  const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+  // Loop through each link
+  navLinks.forEach(link => {
+    // Check if the link's href matches the current URL
+    if (currentURL.includes(link.getAttribute('href'))) {
+      // If it matches, add the 'active' class to the link
+      link.classList.add('active');
+    }
+  });
+</script>
+
   </div>
 </nav>
 

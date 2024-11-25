@@ -1,16 +1,19 @@
+<?php if (isset($post)): ?>
+
 <div class="container py-5">
-    <h1 class="text-center mb-4">Create Blog Post</h1>
-    <form id="category-form" action="create-post" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+    <h1 class="text-center mb-4">Edit Blog Post</h1>
+    <form id="category-form" action="edit-post" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
         <!-- Title Field -->
         <div class="mb-4">
             <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter post title" required>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter post title" value="<?=$post['title']?>" required>
+            <input type="text" class="form-control" id="post_id" name="post_id" value="<?=$post["id"]?>" required hidden>
         </div>
 
         <!-- Content Field -->
         <div class="mb-4">
             <label for="content" class="form-label">Content</label>
-            <textarea class="form-control" id="content" name="content" rows="6" placeholder="Write your content here..." required></textarea>
+            <textarea class="form-control" id="content" name="content" rows="6" placeholder="Write your content here..."  required><?=$post['content']?></textarea>
         </div>
 
         <!-- Category Selection -->
@@ -20,7 +23,9 @@
             <ul id="category-list" class="list-group mt-2"></ul>
             <div class="mt-1" style="font-size:10px">
                 <span class="fw-bold">Selected Categories:</span>
-                <div id="categories-list" class="mt-2"></div>
+                <div id="categories-list" class="mt-2">
+
+                </div>
             </div>
         </div>
 
@@ -30,13 +35,13 @@
             <input type="text" class="form-control" id="tags-search" placeholder="Search for a tag" autocomplete="off">
             <ul id="tag-list" class="list-group mt-2"></ul>
             <div class="mt-1" style="font-size:10px"></div>
-                <span class="fw-bold">Selected Tags:</span>
+                <span class="fw-bold" style="font-size:10px">Selected Tags:</span>
             <div id="tags-list" class="mt-2"></div>
         </div>
 
         <!-- Media Upload -->
         <div class="mb-4">
-            <label for="media" class="form-label">Upload Media</label>
+            <label for="media" class="form-label">Upload Media (Reupload on next edit)</label>
             <input type="file" class="form-control" id="media" name="media[]" accept="image/*,video/*,audio/*" multiple>
             <small class="text-muted">You can upload images, videos, or audio files.</small>
             <div id="media-preview" class="row mt-3 gy-3">
@@ -47,13 +52,14 @@
         <!-- Scheduled Date for Publication -->
         <div class="mb-4">
             <label for="scheduled_at" class="form-label">Schedule for Publication</label>
-            <input type="datetime-local" class="form-control" id="scheduled_at" name="scheduled_at">
+            <input type="datetime-local" class="form-control" id="scheduled_at" name="scheduled_at" value="<?=$post['scheduled_at']?>">
         </div>
 
+        
         <!-- Hidden Fields -->
         <div id="selected-categories-tags">
-            <input type="hidden" name="categories[]" id="categories-input">
-            <input type="hidden" name="tags[]" id="tags-input">
+            <input type="hidden" name="categories[]" id="categories-input" required>
+            <input type="hidden" name="tags[]" id="tags-input" required>
         </div>
 
         <!-- Submit Buttons -->
@@ -70,8 +76,8 @@
 
 <script>
 $(document).ready(function() {
-    let categories = [];  // Array to store selected categories
-    let tags = [];  // Array to store selected tags
+    let categories = [];
+    let tags = [];
 
     // Listen for input events to search for categories
     $('#category-search').on('input', function() {
@@ -83,7 +89,6 @@ $(document).ready(function() {
             $('#category-list').empty();
         }
     });
-
 
     function searchCategories(query) {
         $('#category-list').empty();
@@ -111,17 +116,16 @@ $(document).ready(function() {
         });
     }
 
-
     function addCategoryToList(category) {
         if (!categories.some(cat => cat.id === category.id)) {
             categories.push({ id: category.id, name: category.name });
         }
         updateSelectedCategories();
     }
-
   
     function updateSelectedCategories() {
         $('#categories-list').empty();
+
         categories.forEach(function(category) {
             const box = $('<span>')
                 .addClass('badge bg-light p-2 m-1 text-dark rounded-pill border border-secondary')
@@ -205,12 +209,25 @@ $(document).ready(function() {
         $('#tags-input').val(JSON.stringify(tags)); // Update the hidden input with selected tags
     }
 
-    // Remove tag from the list
     function removeTagFromList(tag) {
         tags = tags.filter(t => t.id !== tag.id);
         updateSelectedTags();
         console.log(tags)
     }
+
+
+    $('form').on('submit', function(event) {
+        let categories = $('#categories-input').val(); // Get the value of the categories input
+        let tags = $('#tags-input').val(); // Get the value of the tags input
+
+        // If either categories or tags are empty, prevent the form submission
+        if (!categories || !tags || categories === "[]" || tags === "[]") {
+            event.preventDefault();  // Prevent form submission
+
+            // Display a message to the user (optional)
+            alert('Please select at least one category and one tag.');
+        }
+    });
 });
 </script>
 
@@ -259,3 +276,5 @@ $(document).ready(function() {
         });
     });
 </script>
+
+<?php endif; ?>
