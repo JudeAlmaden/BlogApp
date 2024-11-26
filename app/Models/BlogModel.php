@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__."/UserModel.php");
 
 class BlogModel {
 
@@ -150,6 +151,7 @@ class BlogModel {
         // Base query
         $query = "
             SELECT 
+                users.id as user_id,
                 blog_posts.id,
                 blog_posts.title,
                 blog_posts.content,
@@ -361,6 +363,149 @@ class BlogModel {
             return ["success" => false, "message" => "Error: " . $e->getMessage()];
         }
     }
+    
+    public function deletePost($user_id,$post_id){
+        try {
+            $conn = $this->connect(); // Assuming you have a method that returns the DB connection
+            $userModel = new UserModel();
+
+            if ($this->isUserAuthor($user_id,$post_id) || $userModel->isUserAdmin($user_id)) {
+                $query = "
+                    DELETE FROM blog_posts 
+                    WHERE blog_posts.id = :post_id";
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+                
+                if ($stmt->execute()) {
+                    return $stmt->rowCount() > 0;
+                }
+            } 
+
+            return false;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage(); // Handle query error
+
+        }
+    }
+
+    public function isUserAuthor($user_id,$post_id){
+        try {
+            $conn = $this->connect();
+
+            $sql = "
+                SELECT *
+                FROM blog_posts 
+                INNER JOIN users on users.id = blog_posts.post_id
+                WHERE blog_posts.id = :post_id AND users.id =:user_id";
+            $stmt = $conn->prepare($sql);
+    
+            // Bind parameters
+            $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+            $stmt->execute();
+            return $stmt->fetchColumn() ? false : false;
+        } catch (PDOException $e) {
+            error_log("Error checking admin status: " . $e->getMessage());
+            return false; // Return false on failure to ensure safety.
+        }
+    }
+
+    public function toggleLike($user_id, $post_id) {
+        try {
+            // Establish a connection
+            $conn = $this->connect();
+    
+            // Begin the transaction
+            $conn->beginTransaction();
+            
+            // Check if the user has already liked the post
+            if ($this->likedByUser($user_id, $post_id)) {
+                // If already liked, remove the like
+    
+                $deleteSql = "
+                    DELETE FROM blog_post_liked_by 
+                    WHERE blog_post_id = :post_id AND user_id = :user_id";
+                $deleteStmt = $conn->prepare($deleteSql);
+                $deleteStmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+                $deleteStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $deleteStmt->execute();
+                
+                // Decrease the likes count in blog_posts table
+                $updateLikesSql = "
+                    UPDATE blog_posts 
+                    SET likes = likes - 1 
+                    WHERE id = :post_id";
+                $updateLikesStmt = $conn->prepare($updateLikesSql);
+                $updateLikesStmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+                $updateLikesStmt->execute();
+                
+            } else {
+                // If not liked, add the like
+                $insertSql = "
+                    INSERT INTO blog_post_liked_by (blog_post_id, user_id) 
+                    VALUES (:post_id, :user_id)";
+                $insertStmt = $conn->prepare($insertSql);
+                $insertStmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+                $insertStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $insertStmt->execute();
+    
+                // Increase the likes count in blog_posts table
+                $updateLikesSql = "
+                    UPDATE blog_posts 
+                    SET likes = likes + 1 
+                    WHERE id = :post_id";
+                $updateLikesStmt = $conn->prepare($updateLikesSql);
+                $updateLikesStmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+                $updateLikesStmt->execute();
+            }
+    
+            // Commit the transaction
+            $conn->commit();
+    
+            // Return true indicating the operation was successful
+            return true;
+    
+        } catch (PDOException $e) {
+            // Rollback the transaction if an error occurs
+            $conn->rollBack();
+            
+            // Log the error message
+            error_log("Error in toggleLike: " . $e->getMessage());
+            
+            // Return false indicating an error occurred
+            return false;
+        }
+    }
+    
+
+    public function likedByUser($user_id, $post_id) {
+        try {
+            // Establish a connection to the database
+            $conn = $this->connect();
+    
+            // Query to check if the user has already liked the post
+            $sql = "
+                SELECT COUNT(*) 
+                FROM blog_post_liked_by 
+                WHERE blog_post_id = :post_id AND user_id = :user_id";
+            $stmt = $conn->prepare($sql);
+    
+            // Bind parameters
+            $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            // If COUNT(*) returns more than 0, it means the user has liked the post
+            return $stmt->fetchColumn() > 0; // returns true if liked, false otherwise
+    
+        } catch (PDOException $e) {
+            // Log the error and return false in case of any issues
+            error_log("Error in likedByUser: " . $e->getMessage());
+            return false; // Return false if there is an error
+        }
+    }
+    
     
 }
 ?>

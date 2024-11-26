@@ -7,31 +7,31 @@
     <div class="container mt-5">
         <div class="blog-post border rounded p-4 shadow-lg">
             <!-- Blog Title -->
-            <h1 class="post-title mb-4"><?= htmlspecialchars($results['title']); ?></h1>
+            <h1 class="post-title mb-4"><?= htmlspecialchars($post['title']); ?></h1>
 
             <!-- Post Meta (Author and Date) -->
             <p class="post-meta text-muted mb-4">
-                <small>Published on <?= date('F j, Y', strtotime($results['created_at'])); ?> by <strong><?= htmlspecialchars($results['author']); ?></strong></small>
+                <small>Published on <?= date('F j, Y', strtotime($post['created_at'])); ?> by <a href="view-profile?id=<?=$post['user_id']?>"><strong><?= htmlspecialchars($post['author']); ?></strong></a></small>
             </p>
 
 
             <!-- Tags -->
-            <?php if (!empty($results['all_tags'])): ?>
+            <?php if (!empty($post['all_tags'])): ?>
                 <div class="post-tags">
                     <strong>Tags:</strong>
                     <?php
-                        $tags = explode(',', $results['all_tags']);
+                        $tags = explode(',', $post['all_tags']);
                         echo implode(', ', array_map('htmlspecialchars', $tags));
                     ?>
                 </div>
             <?php endif; ?>
 
             <!-- Categories -->
-            <?php if (!empty($results['all_categories'])): ?>
+            <?php if (!empty($post['all_categories'])): ?>
                 <div class="post-categories mb-3">
                     <strong>Categories:</strong>
                     <?php
-                        $categories = explode(',', $results['all_categories']);
+                        $categories = explode(',', $post['all_categories']);
                         echo implode(', ', array_map('htmlspecialchars', $categories));
                     ?>
                 </div>
@@ -40,17 +40,17 @@
             <!-- Post Content -->
             <div class="content-wrapper ">
                 <div class="post-content mb-4 border-start ps-5 border-dark pl-3">
-                    <p><?= nl2br(htmlspecialchars($results['content'])); ?></p>
+                    <p><?= nl2br(htmlspecialchars($post['content'])); ?></p>
                 </div>
             </div>
 
             <!-- Images -->
-            <?php if (!empty($results['media_url'])): ?>
+            <?php if (!empty($post['media_url'])): ?>
             <!-- Carousel Container -->
             <div id="imageCarousel" class="carousel carousel-dark slide mb-4" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php
-                        $images = explode(',', $results['media_url']);
+                        $images = explode(',', $post['media_url']);
                         $first = true; // To handle the first image active class
                         foreach ($images as $image): 
                     ?>
@@ -112,50 +112,96 @@
             <!-- Like Button and Like Count -->
             <div class="like-section col-12 d-flex justify-content-end align-items-center mb-4">
                 <!-- Like Count -->
-                <span id="like-count" class="mx-2"><?= $results['likes']; ?> Likes</span>
+                <span id="like-count" class="mx-2"><?= $post['likes']; ?> Likes</span>
 
                 <!-- Like Button -->
-                <button class="btn btn-outline-primary" id="like-button" onclick="toggleLike(<?= $results['id']; ?>)" style="width: 100px;">
+                <button class="btn btn-outline-primary" id="like-button" onclick="toggleLike(<?= $post['id']; ?>)" style="width: 100px;">
                     <i class="fa fa-thumbs-up"></i> Like
                 </button>
             </div>
-
-
         </div>
     </div>
 
 <?php endif; ?>
 
 <script>
-    let isLiked = false; // Track the like status (initially not liked)
+    // Initial state of the like status (Assuming $isLiked is passed from the server-side)
+    let isLiked = <?=$isLiked?>;
 
-    function toggleLike(postId) {
-        // Toggle the like status
-        isLiked = !isLiked;
-
-        // Update the button and like count based on the new like status
+    
+    document.addEventListener('DOMContentLoaded', function() {
         const likeButton = document.getElementById("like-button");
-        const likeCountElement = document.getElementById("like-count");
-        let currentLikes = parseInt(likeCountElement.textContent);
 
+        // Set the initial state of the like button based on isLiked
         if (isLiked) {
             likeButton.classList.add("btn-primary");
             likeButton.classList.remove("btn-outline-primary");
             likeButton.innerHTML = '<i class="fa fa-thumbs-up"></i> Liked';
-            likeCountElement.textContent = (currentLikes + 1) + " Likes";
+
         } else {
             likeButton.classList.remove("btn-primary");
             likeButton.classList.add("btn-outline-primary");
             likeButton.innerHTML = '<i class="fa fa-thumbs-up"></i> Like';
+        }
+    });
+    
+    function toggleLike(postId) {
+        // Toggle the like status
+        const likeButton = document.getElementById("like-button");
+        const likeCountElement = document.getElementById("like-count");
+        let currentLikes = parseInt(likeCountElement.textContent);
+
+        // Check the current like status based on the button's class
+        const buttonIsLiked = likeButton.classList.contains("btn-primary");
+
+        // Update the UI immediately to reflect the new like status
+        if (buttonIsLiked) {
+            likeButton.classList.remove("btn-primary");
+            likeButton.classList.add("btn-outline-primary");
+            likeButton.innerHTML = '<i class="fa fa-thumbs-up"></i> Like';
             likeCountElement.textContent = (currentLikes - 1) + " Likes";
+        } else {
+            likeButton.classList.add("btn-primary");
+            likeButton.classList.remove("btn-outline-primary");
+            likeButton.innerHTML = '<i class="fa fa-thumbs-up"></i> Liked';
+            likeCountElement.textContent = (currentLikes + 1) + " Likes";
         }
 
-        // Simulate AJAX call to update the like status in the database
-        // Make an AJAX request to update the like status in the backend
-        // e.g., using fetch or XMLHttpRequest
-        alert("You " + (isLiked ? "liked" : "unliked") + " post #" + postId);
+        // Make the AJAX request to update the like status in the backend using GET (pass data via query params)
+        const url = `api/like/post?post_id=${postId}`;
+        
+        fetch(url, {
+            method: 'GET',  // Use GET for fetching/updating data
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // If the like status was updated successfully on the server
+                console.log('Post like status updated:', data.message);
+                alert("You " + (buttonIsLiked ? "unliked" : "liked") + " post #" + postId);
+            } else {
+                // If the request fails, revert the UI changes
+                alert('Failed to update like status. Please try again.');
+                if (buttonIsLiked) {
+                    likeButton.classList.add("btn-primary");
+                    likeButton.classList.remove("btn-outline-primary");
+                    likeButton.innerHTML = '<i class="fa fa-thumbs-up"></i> Liked';
+                    likeCountElement.textContent = (currentLikes + 1) + " Likes";
+                } else {
+                    likeButton.classList.remove("btn-primary");
+                    likeButton.classList.add("btn-outline-primary");
+                    likeButton.innerHTML = '<i class="fa fa-thumbs-up"></i> Like';
+                    likeCountElement.textContent = (currentLikes - 1) + " Likes";
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error occurred while updating the like status.');
+        });
     }
 </script>
+
 
 <!-- Include Font Awesome for the like icon (if you haven't already) -->
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>

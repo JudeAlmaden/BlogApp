@@ -4,6 +4,8 @@ require_once("app/Controllers/Home_Controller.php");
 require_once("app/Controllers/Blog_Controller.php");
 require_once("app/Controllers/Tags_Controller.php");
 require_once("app/Controllers/Media_Controller.php");
+require_once("app/Controllers/Comment_Controller.php");
+require_once("app/Controllers/Reply_Controller.php");
 require_once("app/Controllers/Categories_Controller.php");
 require_once("app/utils/sanitize.php");
 require_once("router.php");
@@ -29,6 +31,7 @@ $router->addRoute('/settings', 'HomeController', 'settings', 'GET');
 $router->addRoute('/my-posts', 'HomeController', 'myPosts', 'GET');
 $router->addRoute('/create-post', 'HomeController', 'createBlogFrom', 'GET');
 $router->addRoute('/create-post', 'BlogController', 'createBlogPost', 'POST');
+$router->addRoute('/view-profile', 'HomeController', 'viewProfile', 'GET');
 
 
 //User
@@ -48,7 +51,11 @@ $router->addRoute('/api/get/tags/search', 'TagsController', 'search', 'GET');
 $router->addRoute('/api/get/categories/search', 'CategoriesController', 'search', 'GET');
 $router->addRoute('/api/get/search-posts', 'BlogController', 'search', 'GET');
 $router->addRoute('/api/get/my-posts/search', 'BlogController', 'searchMyPosts', 'GET');
-
+$router->addRoute('/api/create/comment', 'CommentController', 'createComment', 'GET');
+$router->addRoute('/api/get/comment', 'CommentController', 'getComments', 'GET');
+$router->addRoute('/api/create/reply', 'ReplyController', 'createReply', 'GET');
+$router->addRoute('/api/get/reply', 'ReplyController', 'getReplies', 'GET');
+$router->addRoute('/api/like/post', 'BlogController', 'likePost', 'GET');
 
 //Logout
 $router->addRoute('/logout', 'UserController', 'endSession', 'GET');

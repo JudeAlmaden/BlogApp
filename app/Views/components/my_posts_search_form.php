@@ -2,7 +2,7 @@
 <!-- Sidebar Column -->
 <div class="col-12 mb-5 row">
 <div class="col-md-3 mb-5">
-    <div class="card p-4 shadow-sm" >
+    <div class="card p-4 shadow-sm" style="z-index: 10; ">
         <h4 class="mb-4"> Filters</h4>
         <form id="search-form" action="api/get/my-posts/search" method="GET">
             
@@ -298,7 +298,7 @@ $(document).ready(function () {
                                                     </span>
                                                 </small>
                                                 <div class="d-flex justify-content-end">
-                                                    <a href="delete-post?id=${item.id}" class="btn btn-danger col-3 me-1" target="_blank" rel="noopener noreferrer"><i class="fas fa-trash me-2"></i>Delete</a>
+                                                    <a href="delete-post?id=${item.id}" class="btn btn-danger col-3 me-1" target="_blank" ><i class="fas fa-trash me-2"></i>Delete</a>
                                                     <a href="edit-post?id=${item.id}" class="btn btn-success col-3" target="_blank" rel="noopener noreferrer"><i class="fas fa-edit me-2"></i>Edit</a>
                                                 </div>
                                             </div>

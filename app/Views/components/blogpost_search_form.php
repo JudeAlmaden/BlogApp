@@ -281,7 +281,9 @@ $(document).ready(function () {
                                             <div class="card-body">
                                                 <h5 class="card-title">${item.content.length > 30 ? item.content.substring(0, 20) + '...' : item.title}</h5>
                                                 <p class="card-text">${item.content.length > 50 ? item.content.substring(0, 150) + '...' : item.content}</p>
-                                                <p class="card-text m-0"><small class="text-muted">Author: ${item.name}</small></p>
+                                                <p class="card-text m-0"><small class="text-muted">Author:
+                                                    <a href="view-profile?id=${item.user_id}" style="text-decoration:none"> ${item.name}</a>
+                                                </p>
                                                 <p class="card-text m-0"><small class="text-muted">Last updated: ${item.updated_at}</small></p>
                                                 <p class="card-text m-0"><small>Likes: ${item.likes}</small></p>
                                                 <p class="card-text my-0"><small>Tags: ${item.all_tags}</small></p>

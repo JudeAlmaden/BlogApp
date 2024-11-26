@@ -47,6 +47,30 @@ class HomeController extends Controller{
     public function myPosts(){
         $this->view('pages/my_posts');
     }
+
+    public function viewProfile(){
+        $userModel = new UserModel();
+        $userID = (int)$_GET["id"];
+ 
+    
+        // Check if user is logged in, redirect if not
+        if (!isset($userID)) {
+            $_SESSION['errors']=["Cannot Find user"];
+            header('Location: ');  
+            exit();
+        }
+
+        $user=$userModel->getUserByID( $userID);
+
+        if(!empty($user)){
+            $this->view('pages/view_profile',["user"=>   $user]);
+        }
+        else{
+        $_SESSION['errors']=["Cannot Find user"];
+        header('Location: ');  
+        exit;
+        }
+    }
 }
 
 ?>

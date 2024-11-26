@@ -175,6 +175,7 @@ class BlogController extends Controller{
     public function search() {
         $keyword = isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword'], ENT_QUOTES) : '';
         $author = isset($_GET['author']) ? htmlspecialchars($_GET['author'], ENT_QUOTES) : '';
+        $user_id = isset($_GET['user_id']) ? (int)htmlspecialchars($_GET['user_id'], ENT_QUOTES) : '';
         $date_from = isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from'], ENT_QUOTES) : '';
         $date_to = isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to'], ENT_QUOTES) : '';
         $tags = isset($_GET['tags'][0]) ? json_decode($_GET['tags'][0], true) : [];
@@ -204,7 +205,7 @@ class BlogController extends Controller{
 
         $blogsModel = new BlogModel();
         $results = $blogsModel->filteredSearch($keyword, $categories, $tags, $date_from, $date_to, 
-        $offset,$limit,$sortBy,$sortOrder,"Published",null,false,$author);
+        $offset,$limit,$sortBy,$sortOrder,"Published",$user_id,false);
     
         header('Content-Type: application/json');
         echo json_encode($results);  // Send results as JSON
@@ -339,21 +340,31 @@ class BlogController extends Controller{
     }
     
     public function readPost() {
-        $id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
-
-        // Check if $id is numeric and not empty
-        if (empty($id) || !is_numeric($id)) {
-            // Redirect to a fallback page if the condition is not met
-            header("location:posts"); // Update the URL to your desired fallback page
+        $post_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        $user_id = $_SESSION['id'] ?? null;
+    
+        if (!$post_id || !$user_id || !is_numeric($user_id)) {
+            $_SESSION['errors'] = ['Invalid post or user'];
+            header("Location: posts");
             exit();
         }
-        
+    
         $blogsModel = new BlogModel();
-        $results = $blogsModel->getById($id);
-        
-        $this->view('pages/blog_view',['results'=>$results]);
-    }
+        $userModel = new UserModel();
+    
+        $post = $blogsModel->getById($post_id);
+        $user = $userModel->getUserByID($user_id);
+        $isLiked = ($blogsModel->likedByUser($user_id, $post_id)?1:0);
 
+        if ($post && $user) {
+            $this->view('pages/blog_view', ['post' => $post, 'user' => $user, 'isLiked'=>$isLiked]);
+        } else {
+            $_SESSION['errors'] = ['Something went wrong'];
+            header("Location: posts");
+            exit();
+        }
+    }
+    
     public function editPost() {
         // Retrieve user and post IDs
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -527,28 +538,107 @@ class BlogController extends Controller{
                 }
 
         }
-        $user_id = $_SESSION['id'] ?? '';
-        $post_id = isset($_GET['id']) ? (int) htmlspecialchars($_GET['id'], ENT_QUOTES) : null;
-    
-        // Validate the post ID
-        if (!$post_id || !is_numeric($post_id)) {
-            header("location:my-posts");
-            exit();
-        }
-    
-        $blogsModel = new BlogModel();
-        $post = $blogsModel->isAuthor($user_id, $post_id);
-    
-        // If the user is the author and the post exists, render the edit view
-        if ($post) {
-            $this->view('pages/blog_edit', ['post' => $post]);
-        } else {
-            // Redirect to 'my-posts' if the post is not found or user isn't the author
-            $_SESSION["errors"] = ["Access denied or post not found."];
-            header("location:my-posts");
-            exit();
+
+
+        if($_SERVER['REQUEST_METHOD']=='GET'){
+            $user_id = $_SESSION['id'] ?? '';
+            $post_id = isset($_GET['id']) ? (int) htmlspecialchars($_GET['id'], ENT_QUOTES) : null;
+        
+            // Validate the post ID
+            if (!$post_id || !is_numeric($post_id)) {
+                $_SESSION['errors'] = ["Invalid Post"];
+                header("location:my-posts");
+                exit();
+            }
+        
+            $blogsModel = new BlogModel();
+            $post = $blogsModel->isAuthor($user_id, $post_id);
+        
+            // If the user is the author and the post exists, render the edit view
+            if ($post) {
+                $this->view('pages/blog_edit', ['post' => $post]);
+            } else {
+                // Redirect to 'my-posts' if the post is not found or user isn't the author
+                $_SESSION["errors"] = ["Access denied or post not found."];
+                header("location:my-posts");
+                exit();
+            }
         }
     }
     
+    public function deletePost(){
+        $post_id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
+        $user_id = $_SESSION['id'];
+        $errors = [];
+
+        if (empty($user_id)) {
+            $errors = 'Must be logged in required.';
+        }
+        if (empty($post_id)) {
+            $errors = 'Post must exist';
+        }
+        if (empty($id) || !is_numeric($id)) {
+            $errors = "Post not valid";
+        }
+        
+        if(!empty($errors)){
+            $blogsModel = new BlogModel();
+
+            //Attempt to delet the post
+            if($blogsModel->deletePost($user_id,$post_id)){
+                $_SESSION['success'] = ["Successfully deleted post"];
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
+            }
+
+            $_SESSION['errors'] = ["Error: Check if post exsist or prividledge is author or admin"];
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
+        }else{
+            $_SESSION['errors'] = $errors;
+            header("location:home"); 
+            exit();
+        }
+    }
+
+    public function likePost() {
+        // Retrieve post_id from the GET request and user_id from the session
+        $post_id = isset($_GET['post_id']) ? htmlspecialchars($_GET['post_id'], ENT_QUOTES) : '';
+        $user_id = isset($_SESSION['id']) ? $_SESSION['id'] : null;  // Assuming the user id is stored in session
+        $errors = [];
+    
+        // Check if user is logged in
+        if (empty($user_id)) {
+            $errors[] = 'You must be logged in to like a post.';
+        }
+    
+        // Check if post_id is provided
+        if (empty($post_id)) {
+            $errors[] = 'Post ID is required.';
+        }
+    
+        // If there are validation errors, return them
+        if (!empty($errors)) {
+            echo json_encode(['status' => 'error', 'message' => implode(', ', $errors)]);
+            return; // Stop the function execution if errors exist
+        }
+    
+        try {
+            // Proceed with toggling the like status
+            $blogsModel = new BlogModel();
+            $toggled = $blogsModel->toggleLike($user_id, $post_id);
+
+            if ($toggled) {
+                echo json_encode(['status' => 'success', 'message' => 'Like toggled successfully']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to toggle like.']);
+            }
+        } catch (PDOException $e) {
+            // Catch database errors
+            error_log("Error in likePost: " . $e->getMessage());
+            echo json_encode(['status' => 'error', 'message' => 'An error occurred. Please try again later.']);
+        }
+    }
+
 }
 ?>

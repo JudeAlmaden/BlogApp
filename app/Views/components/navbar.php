@@ -1,5 +1,5 @@
 <!-- Custom Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm rounded">
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm rounded" >
   <div class="container-fluid">
     <!-- Logo -->
     <a class="navbar-brand fw-bold fs-3 ps-3" href="#">Blog App</a>
@@ -42,7 +42,7 @@
           Account
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <li><a class="dropdown-item" href="#">Profile</a></li>
+          <li><a class="dropdown-item" href="view-profile?id=<?=$_SESSION['id']?>">Profile</a></li>
           <li><a class="dropdown-item" href="settings">Settings</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="logout">Log out</a></li>

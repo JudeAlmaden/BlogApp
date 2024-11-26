@@ -45,7 +45,11 @@ class UserModel {
       
       $stmt->execute();
 
-      return;
+      if ($stmt->execute()) {
+        return true;  // If the insertion was successful, return true
+      } else {
+          return false; // If the insertion failed, return false
+      }
 
       } catch(PDOException $e) {
         echo "Error: " . $e->getMessage();
@@ -153,7 +157,7 @@ class UserModel {
       $conn = $this->connect();  // Ensure connection is established
       
       // SQL query to fetch name, email, profile_image, and password
-      $sql = "SELECT name, email, profile_image, bio, gender,profile_image password FROM users WHERE id = :id";
+      $sql = "SELECT id,name, email, profile_image, bio, gender,profile_image password FROM users WHERE id = :id";
       $stmt = $conn->prepare($sql);
 
       // Bind the ID parameter
@@ -220,6 +224,22 @@ class UserModel {
     }
   }
 
+  public function isUserAdmin($id){
+    try {
+        $conn = $this->connect();
+        $sql = "SELECT 1 FROM users WHERE id = :id AND privilege = 'admin'";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $stmt->execute();
+
+
+        
+        return $stmt->fetchColumn() ? true : false;
+    } catch (PDOException $e) {
+        error_log("Error checking admin status: " . $e->getMessage());
+        return false; // Return false on failure to ensure safety.
+    }
+  }
 }
 
 
