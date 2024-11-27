@@ -29,7 +29,7 @@ class UserController extends Controller{
     
             // If there are no errors, set session and redirect to homepage
             if (empty($errors)) {
-                $this->setSession($user['id'], $user['name']);
+                $this->setSession($user['id'], $user['name'],$user['privilege']);
                 header('Location: homepage');
                 exit; 
             } else {
@@ -67,7 +67,7 @@ class UserController extends Controller{
                 $errors[] = "Password cannot be empty.";
             } 
             
-            if (!preg_match('/^(?=.*\d)(?=.*[@#\-_$%^&+=§!\?])(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z@#\-_$%^&+=§!\?]{8,20}$/', $password)) {
+            if (!preg_match('/^(?=.*\d)(?=.*[@#\-_$%^&+=§!?.])[A-Za-z0-9@#\-_$%^&+=§!?.]{8,20}$/', $password)) {
                 $errors[] = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
             }
             
@@ -93,12 +93,13 @@ class UserController extends Controller{
         exit;
     }
 
-    function setSession($id, $name){
+    function setSession($id, $name, $privilege){
         session_start();
 
         $_SESSION['id'] = $id;
         $_SESSION['name'] =$name;
-
+        $_SESSION['privilege'] = $privilege;
+        
         return;
     }
 
@@ -187,21 +188,16 @@ class UserController extends Controller{
 
             $userModel = new UserModel();
 
-            if(!$userModel->updateProfile($id,$bio,$gender,$actualPath))
 
             // Check if there are any errors
-            if (empty($errors)) {
-                // Save the sanitized data into the database
-                // Use your database update query here, e.g.:
-                // $userModel->updateProfile($name, $bio, $gender, $avatar);
-        
-                // Redirect or display success message
+            if (empty($errors) &&   $userModel->updateProfile($id, $name, $bio, $gender, $avatar)) {
                 $_SESSION['success'] = ["Profile updated Sucessfully"];
 
                 return header("location:settings");
             } else {
                 // Display errors
-                $_SESSION['error'] = $errors;
+                $errors = "An error has occured";
+                $_SESSION['errors'] = $errors;
                 return header("location:settings");
             }
         }
@@ -283,6 +279,55 @@ class UserController extends Controller{
     
         $_SESSION['errors'] = $errors;
         return header("location:settings");
+    }
+    
+    function setUserPrivilege() {
+        // Initialize an array to hold errors
+        $errors = [];
+    
+        // Sanitize the inputs to avoid malicious code
+        $privilege = sanitizeOutput($_POST["privilege"]);
+        $id = sanitizeOutput($_POST["user_id"]);
+    
+        // Validate that the privilege is either 'user' or 'moderator'
+        if (!in_array($privilege, ['user', 'moderator'])) {
+            // Add error to the errors array if the privilege is not valid
+            $errors[] = "Error: Invalid privilege value. It must be either 'user' or 'moderator'.";
+        }
+    
+        // Ensure user ID is a valid number and greater than 0
+        if (!is_numeric($id) || $id <= 0) {
+            // Add error if user ID is not valid
+            $errors[] = "Error: Invalid user ID.";
+        }
+    
+        // If there are any errors, redirect back with the errors
+        if (!empty($errors)) {
+            // Store errors in the session so they can be displayed on the previous page
+            $_SESSION['errors'] = $errors;
+    
+            // Redirect back to the form page (you can replace this with the desired URL)
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit; // Stop further execution
+        }
+    
+        // If no errors, proceed to set the user privilege using the UserModel
+        try {
+            $userModel = new UserModel();
+            $userModel->setUserPrivilege($privilege, $id);
+            
+            // Optionally, add a success message if needed
+            $_SESSION['success'] = "User privilege updated successfully.";
+    
+            // Redirect to a success page or back to the profile page
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
+        } catch (Exception $e) {
+            // Handle any exceptions that may occur
+            $_SESSION['errors'] = ["Error: Could not update privilege. Please try again later."];
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
+        }
     }
     
 }

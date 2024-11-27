@@ -309,60 +309,61 @@ class BlogModel {
         }
     }
     
-    public function isAuthor($user_id, $post_id) {
-        try{
-            $conn = $this->connect();
+    // //All Posts where The user is the user
+    // public function isAuthor($user_id, $post_id) {
+    //     try{
+    //         $conn = $this->connect();
 
-            $query = "
-            SELECT 
-                blog_posts.*,
-                users.name as author,
-                users.id as user_id,
-                GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name) AS all_tags,
-                GROUP_CONCAT(DISTINCT categories.name ORDER BY categories.name) AS all_categories,
-                GROUP_CONCAT(DISTINCT blog_post_media.file_Path ORDER BY blog_post_media.id) as media_url
-            FROM 
-                blog_posts
-            LEFT JOIN 
-                blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
-            LEFT JOIN 
-                tags ON tags.id = blog_post_tags.tag_id
-            LEFT JOIN 
-                blog_post_category ON blog_posts.id = blog_post_category.blog_post_id
-            LEFT JOIN 
-                categories ON categories.id = blog_post_category.category_id
-            LEFT JOIN
-                blog_post_media on blog_posts.id = blog_post_media.blog_post_id
-            LEFT JOIN
-                users on blog_posts.user_id = users.id
-            WHERE 
-                users.id = ? AND blog_posts.id = ?
-            GROUP BY 
-                blog_posts.id";
+    //         $query = "
+    //         SELECT 
+    //             blog_posts.*,
+    //             users.name as author,
+    //             users.id as user_id,
+    //             GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name) AS all_tags,
+    //             GROUP_CONCAT(DISTINCT categories.name ORDER BY categories.name) AS all_categories,
+    //             GROUP_CONCAT(DISTINCT blog_post_media.file_Path ORDER BY blog_post_media.id) as media_url
+    //         FROM 
+    //             blog_posts
+    //         LEFT JOIN 
+    //             blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+    //         LEFT JOIN 
+    //             tags ON tags.id = blog_post_tags.tag_id
+    //         LEFT JOIN 
+    //             blog_post_category ON blog_posts.id = blog_post_category.blog_post_id
+    //         LEFT JOIN 
+    //             categories ON categories.id = blog_post_category.category_id
+    //         LEFT JOIN
+    //             blog_post_media on blog_posts.id = blog_post_media.blog_post_id
+    //         LEFT JOIN
+    //             users on blog_posts.user_id = users.id
+    //         WHERE 
+    //             users.id = ? AND blog_posts.id = ?
+    //         GROUP BY 
+    //             blog_posts.id";
 
-            // Prepare the query
-            $stmt = $conn->prepare($query);
-            if (!$stmt) {
-                return ["error" => "Query preparation failed."];
-            }
+    //         // Prepare the query
+    //         $stmt = $conn->prepare($query);
+    //         if (!$stmt) {
+    //             return ["error" => "Query preparation failed."];
+    //         }
 
-            // Bind the ID parameter and execute the query
-            $stmt->execute([$user_id,$post_id]);
+    //         // Bind the ID parameter and execute the query
+    //         $stmt->execute([$user_id,$post_id]);
 
-            // Fetch the result
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    //         // Fetch the result
+    //         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Check if the blog post exists
-            if ($result) {
-                return $result;
-            } else {
-                return ["error" => "Blog post not found."];
-            }
-        }catch (PDOException $e) {
-            // Handle exceptions
-            return ["success" => false, "message" => "Error: " . $e->getMessage()];
-        }
-    }
+    //         // Check if the blog post exists
+    //         if ($result) {
+    //             return $result;
+    //         } else {
+    //             return ["error" => "Blog post not found."];
+    //         }
+    //     }catch (PDOException $e) {
+    //         // Handle exceptions
+    //         return ["success" => false, "message" => "Error: " . $e->getMessage()];
+    //     }
+    // }
     
     public function deletePost($user_id,$post_id){
         try {
@@ -388,28 +389,33 @@ class BlogModel {
         }
     }
 
-    public function isUserAuthor($user_id,$post_id){
+    public function isUserAuthor($user_id, $post_id)
+    {          
         try {
             $conn = $this->connect();
-
+            
             $sql = "
-                SELECT *
-                FROM blog_posts 
-                INNER JOIN users on users.id = blog_posts.post_id
-                WHERE blog_posts.id = :post_id AND users.id =:user_id";
+                SELECT COUNT(*)
+                FROM blog_posts
+                INNER JOIN users ON users.id = blog_posts.user_id
+                WHERE blog_posts.id = :post_id AND users.id = :user_id";
             $stmt = $conn->prepare($sql);
     
             // Bind parameters
             $stmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
             $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-
+    
             $stmt->execute();
-            return $stmt->fetchColumn() ? false : false;
+
+            // Fetch the count
+            return $stmt->fetchColumn() > 0; 
         } catch (PDOException $e) {
-            error_log("Error checking admin status: " . $e->getMessage());
+            error_log("Error checking author status: " . $e->getMessage());
             return false; // Return false on failure to ensure safety.
         }
     }
+    
+    
 
     public function toggleLike($user_id, $post_id) {
         try {

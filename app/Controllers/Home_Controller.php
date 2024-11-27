@@ -71,6 +71,27 @@ class HomeController extends Controller{
         exit;
         }
     }
+
+
+    public function searchUsers() {
+        // Check if a search query was provided
+        if (isset($_GET['query']) && !empty($_GET['query'])) {
+            $query = trim($_GET['query']); // sanitize the search input
+
+            // Create instance of the UserModel
+            $userModel = new UserModel();
+
+            // Fetch users based on the search query
+            $users = $userModel->searchUsersByQuery($query);
+
+            // Pass the search results to a view (you can adjust the view as needed)
+            $this->view('pages/users_search',["users"=>$users]);
+        } else {
+            // If no search query, redirect to homepage or show an error message
+            header("Location: homepage"); // Or handle an error as needed
+            exit;
+        }
+    }
 }
 
 ?>

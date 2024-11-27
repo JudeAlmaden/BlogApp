@@ -1,5 +1,5 @@
 <!-- Custom Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm rounded" >
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm rounded">
   <div class="container-fluid">
     <!-- Logo -->
     <a class="navbar-brand fw-bold fs-3 ps-3" href="#">Blog App</a>
@@ -11,45 +11,51 @@
 
     <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav ms-auto">
-      <!-- Home Link -->
-      <li class="nav-item">
-        <a class="nav-link fs-5" id="home-link" href="homepage">Home</a>
-      </li>
-      <!-- Create Post Link -->
-      <li class="nav-item">
-        <a class="nav-link fs-5" id="create-post-link" href="create-post">Create Post</a>
-      </li>
-      <!-- See other posts -->
-      <li class="nav-item">
-        <a class="nav-link fs-5" id="view-posts-link" href="posts-lists">View Posts</a>
-      </li>
-      <!-- My Posts Link -->
-      <li class="nav-item">
-        <a class="nav-link fs-5" id="my-posts-link" href="my-posts">My Posts</a>
-      </li>
-      <!-- About Link -->
-      <li class="nav-item">
-        <a class="nav-link fs-5" id="about-link" href="#">About</a>
-      </li>
-      <!-- Contact Link -->
-      <li class="nav-item">
-        <a class="nav-link fs-5" id="contact-link" href="#">Contact</a>
-      </li>
-      <!-- User Account Dropdown -->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle fs-5" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Account
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <li><a class="dropdown-item" href="view-profile?id=<?=$_SESSION['id']?>">Profile</a></li>
-          <li><a class="dropdown-item" href="settings">Settings</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="logout">Log out</a></li>
-        </ul>
-      </li>
-    </ul>
+      <ul class="navbar-nav ms-auto">
+        <!-- Home Link -->
+        <li class="nav-item">
+          <a class="nav-link fs-5" id="home-link" href="homepage">Home</a>
+        </li>
+        <!-- Create Post Link -->
+        <li class="nav-item">
+          <a class="nav-link fs-5" id="create-post-link" href="create-post">Create Post</a>
+        </li>
+        <!-- See other posts -->
+        <li class="nav-item">
+          <a class="nav-link fs-5" id="view-posts-link" href="posts-lists">View Posts</a>
+        </li>
+        <!-- My Posts Link -->
+        <li class="nav-item">
+          <a class="nav-link fs-5" id="my-posts-link" href="my-posts">My Posts</a>
+        </li>
+
+        <!-- Search Form -->
+        <li class="nav-item d-flex align-items-center">
+          <form action="search-users" method="GET" class="d-flex w-auto">
+            <div class="input-group">
+              <input type="text" name="query" id="search-query" class="form-control border-0 rounded-pill" placeholder="Search users..." aria-label="Search users">
+              <button type="submit" class="btn btn-outline-primary rounded-pill ms-2">Search</button>
+            </div>
+          </form>
+        </li>
+
+        <!-- User Account Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle fs-5" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Account
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="view-profile?id=<?=$_SESSION['id']?>">Profile</a></li>
+            <li><a class="dropdown-item" href="settings">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="logout">Log out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
+</nav>
+
 
 <script>
   // Get the current URL

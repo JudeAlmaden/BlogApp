@@ -1,4 +1,4 @@
-<div class="col-md-3 my-5 p-5">
+<div class="col-md-3 mt-5 p-5">
     <?php if ($user): ?>
         <div class="user-profile sticky-profile">
             <!-- Profile Avatar Image -->
@@ -29,8 +29,44 @@
                 <!-- Bio with Icon -->
                 <div class="profile-item">
                     <i class="fas fa-user-edit"></i>
-                    <p><strong>Bio:</strong> <?php echo nl2br(htmlspecialchars($user['bio'])); ?></p>
+                    <p><strong>Bio:</strong> <?php echo ($user['bio']); ?></p>
                 </div>
+
+                <?php if ($_SESSION['privilege'] == 'admin' && $user['id'] != $_SESSION['id']): ?>
+                    <!-- Privilege Management Form -->
+                    <div class="profile-item mt-4">
+                        <form action="set-user" method="POST" class="d-flex align-items-center justify-content-between">
+                            <!-- Hidden user ID -->
+                            <input type="number" name="user_id" id="user_id" class="form-control" value="<?= $user['id'] ?>" hidden>
+
+                            <!-- Privilege Select -->
+                            <select name="privilege" id="privilege" class="form-select form-select-sm" required style="max-width: 160px;">
+                                <option value="user" <?php echo ($user['privilege'] == 'user') ? 'selected' : ''; ?>>User</option>
+                                <option value="moderator" <?php echo ($user['privilege'] == 'moderator') ? 'selected' : ''; ?>>Moderator</option>
+                            </select>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-sm ms-3">Set</button>
+                        </form>
+                    </div>
+                <?php else: ?>
+                    <!-- Display User Privilege Badge for Non-admin Users or Same Session -->
+                    <div class="profile-item mt-4">
+                        <strong>Privilege:</strong> 
+                        <span class="badge 
+                            <?php 
+                                if ($user['privilege'] == 'admin') {
+                                    echo 'bg-danger';  // Red for Admin
+                                } elseif ($user['privilege'] == 'moderator') {
+                                    echo 'bg-warning';  // Yellow for Moderator
+                                } else {
+                                    echo 'bg-secondary';  // Grey for User
+                                }
+                            ?>">
+                            <?= ucfirst($user['privilege']) ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     <?php else: ?>

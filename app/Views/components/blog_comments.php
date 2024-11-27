@@ -8,8 +8,14 @@
         <form id="commentForm" action="#" method="POST">
             <div class="d-flex align-items-center mb-3">
                 <!-- User Avatar -->
-                <img src="<?=$user['profile_image']?>" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-                
+                <?php if (empty($user['profile_image'])): ?>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white me-3" style="width: 50px; height: 50px; font-size: 10px;">
+                        No Image
+                    </div>
+                <?php else: ?>
+                    <img src="<?=$user['profile_image']?>" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                <?php endif; ?>
+
                 <!-- User Info -->
                 <div>
                     <h6 class="mb-0"><?=$user['name']?></h6>
@@ -53,43 +59,43 @@
             }
 
 
-        .comment {
-            background-color: #f9f9f9;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+            .comment {
+                background-color: #f9f9f9;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
 
-        .btn-link {
-            color: #007bff;
-            font-size: 14px;
-        }
+            .btn-link {
+                color: #007bff;
+                font-size: 14px;
+            }
 
-        .btn-link:hover {
-            text-decoration: underline;
-        }
+            .btn-link:hover {
+                text-decoration: underline;
+            }
 
-        .replies {
-            margin-left: 20px;
-        }
+            .replies {
+                margin-left: 20px;
+            }
 
-        .replyForm {
-            display: flex;
-            flex-direction: column;
-        }
+            .replyForm {
+                display: flex;
+                flex-direction: column;
+            }
 
-        .card-body {
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f1f1f1;
-        }
+            .card-body {
+                padding: 15px;
+                border-radius: 8px;
+                background-color: #f1f1f1;
+            }
 
-        .replyForm textarea {
-            resize: none;
-            margin-bottom: 10px;
-        }
+            .replyForm textarea {
+                resize: none;
+                margin-bottom: 10px;
+            }
 
-        .btn-secondary {
-            align-self: flex-start;
-        }
+            .btn-secondary {
+                align-self: flex-start;
+            }
         </style>
 
         <div id="commentsContainer" class="row">    <!-- Comments Here  --></div>
@@ -100,111 +106,127 @@
 $(document).ready(function() {
     let index = 0;
     canLoadMore=true;
+    isQuerying = false;
 
-    function fetchSearchResults() {
-        $.ajax({
-            url: "api/get/comment",  // API URL to fetch comments
-            method: 'GET',
-            data: { 
-                id: <?= $post['id']; ?>, // Send the current post ID
-                index: index, // Send the current index for pagination
-            },
-            success: function(response) {
-                console.log(response);
-                if (response.status === 'success') {
-                    // Add the fetched comments to the page (you can adjust this as needed)
-                    response.data.forEach(function(comment) {
-                        // Append each comment in the provided format
-                        $('#commentsContainer').append(
-                            `<div class="comment mb-4 p-4 border rounded shadow-sm col-12">
-                                <div class="d-flex align-items-center mb-3">
-                                    <!-- User Avatar -->
-                                    <img src="${comment.profile_image || 'https://via.placeholder.com/50'}" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+    function fetchComments() {
+        if(!isQuerying){
+            isQuerying = true;
+            $.ajax({
+                url: "api/get/comment",  // API URL to fetch comments
+                method: 'GET',
+                data: { 
+                    id: <?= $post['id']; ?>, // Send the current post ID
+                    index: index, // Send the current index for pagination
+                },
+                complete: function(){
+                    isQuerying= false
+                },
+                success: function(response) {
+        
+                    
+                    if (response.status === 'success') {
+                        // Add the fetched comments to the page (you can adjust this as needed)
+                        response.data.forEach(function(comment) {
+                            // Append each comment in the provided format
+                            $('#commentsContainer').append(
+                                `<div class="comment mb-4 p-4 border rounded shadow-sm col-12">
+                                    <?php if ($isAdmin): ?>
+                                        <div class="d-flex justify-content-end">
+                                            <a href="delete-comment?id=${comment.id}&post_id=<?=$post['id']?>" class="text-secondary small" style="margin-right:0px;" onclick="return confirm('Are you sure you want to delete this comment?');">
+                                                <i class="fas fa-trash me-1"></i>Delete
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="d-flex align-items-center mb-3">
+                                        <!-- User Avatar -->
+                                        <img src="${comment.profile_image || 'https://via.placeholder.com/50'}" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                                        
+                                        <!-- User Info -->
+                                        <div>
+                                            <h6 class="mb-0">${comment.name}</h6>
+                                            <small class="text-muted">Posted on ${comment.created_at}</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Comment Content -->
+                                    <p class="mb-0">${comment.content}</p>
+
+                                    <!-- Reply Button -->
+                                    <div class="d-flex mt-2">
+                                        <button 
+                                            class="btn btn-link text-decoration-none me-2 fetch-replies-btn" 
+                                            type="button" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#replySection${comment.id}" 
+                                            aria-expanded="false" 
+                                            aria-controls="replySection${comment.id}" 
+                                            data-comment-id="${comment.id}">
+                                            Replies (${comment.responses})
+                                        </button>
+                                        <button class="btn btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#replySection${comment.id}-reply" aria-expanded="false" aria-controls="replySection${comment.id}-reply">
+                                            Reply
+                                        </button>
+                                    </div>
                                     
-                                    <!-- User Info -->
-                                    <div>
-                                        <h6 class="mb-0">${comment.name}</h6>
-                                        <small class="text-muted">Posted on ${comment.created_at}</small>
+                                    <hr>
+
+                                    <!-- Replies Section -->
+                                    <div class="collapse mt-3" id="replySection${comment.id}">
+                                        <div class="replies mt-4 ps-4 border-start border-dark border-3" id="replies">
+                                            <!-- Here, the replies will be dynamically inserted -->
+                                        </div>
                                     </div>
-                                </div>
-
-                                <!-- Comment Content -->
-                                <p class="mb-0">${comment.content}</p>
-
-                                <!-- Reply Button -->
-                                <div class="d-flex mt-2">
-                                    <button 
-                                        class="btn btn-link text-decoration-none me-2 fetch-replies-btn" 
-                                        type="button" 
-                                        data-bs-toggle="collapse" 
-                                        data-bs-target="#replySection${comment.id}" 
-                                        aria-expanded="false" 
-                                        aria-controls="replySection${comment.id}" 
-                                        data-comment-id="${comment.id}">
-                                        Replies (${comment.responses})
-                                    </button>
-                                    <button class="btn btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#replySection${comment.id}-reply" aria-expanded="false" aria-controls="replySection${comment.id}-reply">
-                                        Reply
-                                    </button>
-                                </div>
-                                
-                                <hr>
-
-                                <!-- Replies Section -->
-                                <div class="collapse mt-3" id="replySection${comment.id}">
-                                    <div class="replies mt-4 ps-4 border-start border-dark border-3" id="replies">
-                                        <!-- Here, the replies will be dynamically inserted -->
-                                    </div>
-                                </div>
 
 
-                                <!-- Reply Form Section -->
-                                <div class="collapse mt-3" id="replySection${comment.id}-reply">
-                                    <div class="card card-body p-3">
-                                        <form data-comment-id="${comment.id}" class="replyForm">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <img src="<?=$user['profile_image']?>" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-                                                    <!-- User Info -->
-                                                    <div>
-                                                        <h6 class="mb-0"><?=$user['name']?></h6>
-                                                        <small class="text-muted">You are replying as <?=$user['name']?></small>
+                                    <!-- Reply Form Section -->
+                                    <div class="collapse mt-3" id="replySection${comment.id}-reply">
+                                        <div class="card card-body p-3">
+                                            <form data-comment-id="${comment.id}" class="replyForm">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <img src="<?= !empty($user['profile_image']) ? $user['profile_image'] : 'https://via.placeholder.com/50'; ?>" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                                                        <!-- User Info -->
+                                                        <div>
+                                                            <h6 class="mb-0"><?=$user['name']?></h6>
+                                                            <small class="text-muted">You are replying as <?=$user['name']?></small>
+                                                        </div>
                                                     </div>
+                                                    <textarea id="reply-comment" class="form-control" rows="2" placeholder="Write your reply here"></textarea>
+                                                    <button type="submit" class="btn btn-secondary btn-sm">Submit Reply</button>
                                                 </div>
-                                                <textarea id="reply-comment" class="form-control" rows="2" placeholder="Write your reply here"></textarea>
-                                                <button type="submit" class="btn btn-secondary btn-sm">Submit Reply</button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>`
-                        );
+                                </div>`
+                            );
 
-                        if (!response.has_more) {
-                            canLoadMore=false;
-                        }else{
-                            const resultCard = `
-                            <div class="my-3 mb-2 fs-4 text-center">
-                                Seems like that's everything
-                            </div>`;
-                        $('#results').append(resultCard);
-                            index+=1;
-                        }
-                    });
-                } else {
-                    console.log('No more comments to load.');
+                            if (!response.has_more) {
+                                canLoadMore=false;
+                            }else{
+                                const resultCard = `
+                                <div class="my-3 mb-2 fs-4 text-center">
+                                    Seems like that's everything
+                                </div>`;
+                            $('#results').append(resultCard);
+                                index+=1;
+                            }
+                        });
+                    } else {
+                        console.log('No more comments to load.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching comments:', error);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching comments:', error);
-            }
-        });
+            });
+        }
     }
-    fetchSearchResults();
+    fetchComments();
     $(window).scroll(function() {
         // Check if we are at the bottom of the page
         if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
             if(canLoadMore){
-                fetchSearchResults();
+                fetchComments();
             }
         }
     });
@@ -309,79 +331,87 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.fetch-replies-btn', function () {
-    const commentId = $(this).data('comment-id'); 
-    const repliesContainer = `#replySection${commentId} .replies`; 
-    let index = 0; // Start from the first set of replies
+    
+        const commentId = $(this).data('comment-id'); 
+        const repliesContainer = `#replySection${commentId} .replies`; 
+        let index = 0; // Start from the first set of replies
 
-    // AJAX request to fetch replies
-    $.ajax({
-        url: 'api/get/reply', 
-        method: 'GET',
-        data: {
-            comment_id: commentId, 
-            index: index
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                // Clear existing replies before appending new ones
-                $(repliesContainer).empty();
+        // AJAX request to fetch replies
+        $.ajax({
+            url: 'api/get/reply', 
+            method: 'GET',
+            data: {
+                comment_id: commentId, 
+                index: index
+            },
+            success: function (response) {
+                if (response.status === 'success') {
+                    // Clear existing replies before appending new ones
+                    $(repliesContainer).empty();
 
-                // Loop through the replies and append them
-                response.data.forEach(reply => {
-                    $(repliesContainer).prepend(`
-                        <div class="reply mb-3 p-3 border rounded shadow-sm">
-                            <div class="d-flex align-items-center mb-2">
-                                <img src="${reply.profile_image || 'https://via.placeholder.com/40'}" 
-                                    alt="Reply User Avatar" 
-                                    class="rounded-circle me-3" 
-                                    style="width: 40px; height: 40px;">
-                                <div>
-                                    <h6 class="mb-0">${reply.name}</h6>
-                                    <small class="text-muted">Replied on ${reply.created_at}</small>
+                    // Loop through the replies and append them
+                    response.data.forEach(reply => {
+                        $(repliesContainer).prepend(`
+                            <div class="reply mb-3 p-3 border rounded shadow-sm">
+                                    <?php if ($isAdmin): ?>
+                                        <div class="d-flex justify-content-end">
+                                            <a href="delete-reply?id=${reply.id}&post_id=<?=$post['id']?>" class="text-secondary small" style="margin-right:0px;" onclick="return confirm('Are you sure you want to delete this reply?');">
+                                                <i class="fas fa-trash me-1"></i>Delete
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="${reply.profile_image || 'https://via.placeholder.com/40'}" 
+                                        alt="Reply User Avatar" 
+                                        class="rounded-circle me-3" 
+                                        style="width: 40px; height: 40px;">
+                                    <div>
+                                        <h6 class="mb-0">${reply.name}</h6>
+                                        <small class="text-muted">Replied on ${reply.created_at}</small>
+                                    </div>
                                 </div>
+                                <p class="mb-0">${reply.content}</p>
                             </div>
-                            <p class="mb-0">${reply.content}</p>
-                        </div>
-                    `);
-                });
+                        `);
+                    });
 
-                // If no replies are found, show a message
-                if (response.data.length === 0) {
-                    $(repliesContainer).append('<p class="text-muted">No replies yet.</p>');
-                }
+                    // If no replies are found, show a message
+                    if (response.data.length === 0) {
+                        $(repliesContainer).append('<p class="text-muted">No replies yet.</p>');
+                    }
 
-                // If there are more replies to load, show the "Get more replies" button
-                if (response.has_more) {
-                    $(repliesContainer).prepend(`
-                        <button class="btn btn-link text-decoration-none load-more-replies" 
-                            data-comment-id="${commentId}">
-                            Get more replies
+                    // If there are more replies to load, show the "Get more replies" button
+                    if (response.has_more) {
+                        $(repliesContainer).prepend(`
+                            <button class="btn btn-link text-decoration-none load-more-replies" 
+                                data-comment-id="${commentId}">
+                                Get more replies
+                            </button>
+                        `);
+                    } else {
+                        // If no more replies, indicate that there are no more to load
+                        $(repliesContainer).append('<p class="text-muted">No more replies.</p>');
+                    }
+
+                    // Append the "Collapse" button
+                    $(repliesContainer).append(`
+                        <button class="btn btn-link text-decoration-none collapse-replies" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#replySection${commentId}" 
+                            aria-expanded="true" 
+                            aria-controls="replySection${commentId}">
+                            Collapse
                         </button>
                     `);
                 } else {
-                    // If no more replies, indicate that there are no more to load
-                    $(repliesContainer).append('<p class="text-muted">No more replies.</p>');
+                    console.error('Error fetching replies:', response.message);
                 }
-
-                // Append the "Collapse" button
-                $(repliesContainer).append(`
-                    <button class="btn btn-link text-decoration-none collapse-replies" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#replySection${commentId}" 
-                        aria-expanded="true" 
-                        aria-controls="replySection${commentId}">
-                        Collapse
-                    </button>
-                `);
-            } else {
-                console.error('Error fetching replies:', response.message);
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error:', error);
             }
-        },
-        error: function (xhr, status, error) {
-            console.error('AJAX error:', error);
-        }
+        });
     });
-});
 
     // Event handler for "Get more replies" button click
     $(document).on('click', '.load-more-replies', function () {
@@ -403,6 +433,13 @@ $(document).ready(function() {
                     response.data.forEach(reply => {
                         $(repliesContainer).append(`
                             <div class="reply mb-3 p-3 border rounded shadow-sm">
+                                <?php if ($isAdmin): ?>
+                                    <div class="d-flex justify-content-end">
+                                        <a href="delete-reply?id=${reply.id}&post_id=<?=$post['id']?>" class="text-secondary small" style="margin-right:0px;" onclick="return confirm('Are you sure you want to delete this reply?');">
+                                            <i class="fas fa-trash me-1"></i>Delete
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="d-flex align-items-center mb-2">
                                     <img src="${reply.profile_image || 'https://via.placeholder.com/40'}" 
                                         alt="Reply User Avatar" 

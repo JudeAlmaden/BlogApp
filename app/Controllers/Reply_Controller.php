@@ -2,6 +2,7 @@
 
 require_once("Controller.php");
 require_once(__DIR__."/../Models/ReplyModel.php");
+require_once(__DIR__."/../Models/BlogModel.php");
 class ReplyController extends Controller
 {
     public function createReply(){
@@ -60,5 +61,45 @@ class ReplyController extends Controller
             // If no comments exist, return an error message
             echo json_encode(['status' => 'error', 'message' => 'No comments found for this post']);
         }
+    }
+
+    public function deleteReply(){
+        $reply_id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
+        $post_id = isset($_GET['post_id']) ? htmlspecialchars($_GET['post_id'], ENT_QUOTES) : '';
+        $user_id = $_SESSION['id'];
+
+        $errors = [];
+
+        if (empty($user_id)) {
+            $errors = 'Must be logged in required.';
+        }
+        if (empty($reply_id)) {
+            $errors = 'Comment must exist';
+        }
+        if (empty($id) || !is_numeric($id)) {
+            $errors = "Post not valid";
+        }
+
+        
+        if(!empty($errors)){
+            $replyModel = new ReplyModel();
+            $blogModel = new BlogModel();
+            //Attempt to delete the post
+            if($_SESSION['privilege'] === 'admin' || $_SESSION['privilege'] === 'moderator' || $blogModel->isUserAuthor($user_id,$post_id)){
+                $replyModel->deleteReply($reply_id);
+                $_SESSION['success'] = ["Successfully deleted post"];
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
+            }
+
+            $_SESSION['errors'] = ["Error: Check if post exsist or privilege is author or admin"];
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
+        }else{
+            $_SESSION['errors'] = $errors;
+            header("location:home"); 
+            exit();
+        }
+
     }
 }

@@ -340,10 +340,13 @@ class BlogController extends Controller{
     }
     
     public function readPost() {
-        $post_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        $post_id = $_GET['id'];
         $user_id = $_SESSION['id'] ?? null;
-    
-        if (!$post_id || !$user_id || !is_numeric($user_id)) {
+        $isAdmin = false;
+
+
+        
+        if (!$post_id || !$user_id || !is_numeric($user_id)||!is_numeric($post_id)) {
             $_SESSION['errors'] = ['Invalid post or user'];
             header("Location: posts");
             exit();
@@ -351,13 +354,18 @@ class BlogController extends Controller{
     
         $blogsModel = new BlogModel();
         $userModel = new UserModel();
-    
+        
+
+        if ($_SESSION['privilege'] === 'admin' || $_SESSION['privilege'] === 'moderator' ||  $blogsModel->isUserAuthor($user_id, $post_id) ) {
+            $isAdmin = true;  
+        }
+
         $post = $blogsModel->getById($post_id);
         $user = $userModel->getUserByID($user_id);
         $isLiked = ($blogsModel->likedByUser($user_id, $post_id)?1:0);
 
         if ($post && $user) {
-            $this->view('pages/blog_view', ['post' => $post, 'user' => $user, 'isLiked'=>$isLiked]);
+            $this->view('pages/blog_view', ['post' => $post, 'user' => $user, 'isLiked'=>$isLiked, 'isAdmin'=>$isAdmin]);
         } else {
             $_SESSION['errors'] = ['Something went wrong'];
             header("Location: posts");
@@ -552,7 +560,7 @@ class BlogController extends Controller{
             }
         
             $blogsModel = new BlogModel();
-            $post = $blogsModel->isAuthor($user_id, $post_id);
+            $post = $blogsModel->isUserAuthor($user_id, $post_id);
         
             // If the user is the author and the post exists, render the edit view
             if ($post) {
@@ -584,7 +592,7 @@ class BlogController extends Controller{
         if(!empty($errors)){
             $blogsModel = new BlogModel();
 
-            //Attempt to delet the post
+            //Attempt to delete the post
             if($blogsModel->deletePost($user_id,$post_id)){
                 $_SESSION['success'] = ["Successfully deleted post"];
                 header("Location: " . $_SERVER['HTTP_REFERER']);

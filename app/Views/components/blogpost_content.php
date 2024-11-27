@@ -4,8 +4,18 @@
     </div>
 <?php else: ?>
 
+
+    
     <div class="container mt-5">
         <div class="blog-post border rounded p-4 shadow-lg">
+            <?php if ($isAdmin): ?>
+                <div class="d-flex justify-content-end">
+                    <a href="delete-post?id=<?php echo $post_id; ?>" class="text-secondary small" style="margin-right:0px;" onclick="return confirm('Are you sure you want to delete this post?');">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </a>
+                </div>
+            <?php endif; ?>
+
             <!-- Blog Title -->
             <h1 class="post-title mb-4"><?= htmlspecialchars($post['title']); ?></h1>
 

@@ -59,5 +59,44 @@ class CommentController extends Controller
             echo json_encode(['status' => 'error', 'message' => 'No comments found for this post']);
         }
     }
-    
+
+    public function deleteComment(){
+        $comment_id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
+        $post_id = isset($_GET['post_id']) ? htmlspecialchars($_GET['post_id'], ENT_QUOTES) : '';
+        $user_id = $_SESSION['id'];
+
+        $errors = [];
+
+        if (empty($user_id)) {
+            $errors = 'Must be logged in required.';
+        }
+        if (empty($comment_id)) {
+            $errors = 'Comment must exist';
+        }
+        if (empty($id) || !is_numeric($id)) {
+            $errors = "Post not valid";
+        }
+
+        
+        if(!empty($errors)){
+            $commentModel = new CommentModel();
+            $blogModel = new BlogModel();
+            //Attempt to delete the post
+            if($_SESSION['privilege'] === 'admin' || $_SESSION['privilege'] === 'moderator' || $blogModel->isUserAuthor($user_id,$post_id)){
+                $commentModel->deleteComment($comment_id);
+                $_SESSION['success'] = ["Successfully deleted post"];
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
+            }
+
+            $_SESSION['errors'] = ["Error: Check if post exsist or privilege is author or admin"];
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
+        }else{
+            $_SESSION['errors'] = $errors;
+            header("location:home"); 
+            exit();
+        }
+
+    }
 }

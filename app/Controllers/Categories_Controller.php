@@ -13,7 +13,6 @@ class CategoriesController extends Controller{
         echo json_encode($categories);
       }
 
-
       public function search() {
         $search = isset($_GET['search']) ? $_GET['search'] : '';
 

@@ -31,30 +31,38 @@ class UserModel {
   }
   
   function insertUser($name, $email, $password) {
-    try{
-      $conn = $this->connect();
+    try {
+        $conn = $this->connect();
 
-      $sql = "INSERT INTO  users (name,email,password) 
-      VALUES(:name, :email,:password)";
+        // Check if any users exist
+        $sqlCheck = "SELECT COUNT(*) FROM users";
+        $stmtCheck = $conn->prepare($sqlCheck);
+        $stmtCheck->execute();
+        $userCount = $stmtCheck->fetchColumn();
 
-      $stmt = $conn->prepare($sql);
+        // Set privilege to 'admin' if no users exist, otherwise set 'user' by default
+        $privilege = ($userCount == 0) ? 'admin' : 'user';
 
-      $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-      $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-      $stmt->bindParam(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
-      
-      $stmt->execute();
+        // Insert the new user
+        $sql = "INSERT INTO users (name, email, password, privilege) 
+                VALUES (:name, :email, :password, :privilege)";
 
-      if ($stmt->execute()) {
-        return true;  // If the insertion was successful, return true
-      } else {
-          return false; // If the insertion failed, return false
-      }
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->bindParam(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
+        $stmt->bindParam(':privilege', $privilege, PDO::PARAM_STR); // Bind privilege parameter
 
-      } catch(PDOException $e) {
+        if ($stmt->execute()) {
+            return true;  // If the insertion was successful, return true
+        } else {
+            return false; // If the insertion failed, return false
+        }
+    } catch(PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
   }
+
 
   function getUserLogin($email, $password) {
     try {
@@ -82,38 +90,38 @@ class UserModel {
   }
 
  // Method to update profile (bio, gender, and image)
-  public function updateProfile($id, $bio, $gender, $img = null) {
-    try {
-        $conn = $this->connect();
+  public function updateProfile($id, $name = null, $bio = "", $gender, $img = null) {
+  try {
+      $conn = $this->connect();
 
-        // Base SQL query for updating bio and gender
-        $sql = "UPDATE users SET bio = :bio, gender = :gender";
+      $sql = "UPDATE users SET bio = :bio, gender = :gender";
+      if ($name !== null) {
+          $sql .= ", name = :name";
+      }
+      if ($img !== null) {
+          $sql .= ", profile_image = :profile_image";
+      }
+      $sql .= " WHERE id = :id";
+      $stmt = $conn->prepare($sql);
 
-        // If $img is not null, add the profile_image update to the SQL query
-        if ($img !== null) {
-            $sql .= ", profile_image = :profile_image";
-        }
+      $stmt->bindParam(':bio', $bio, PDO::PARAM_STR);
+      $stmt->bindParam(':gender', $gender, PDO::PARAM_STR);
+      $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
-        // Complete the query with the WHERE clause
-        $sql .= " WHERE id = :id";
+      if ($name !== null) {
+          $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+      }
+      if ($img !== null) {
+          $stmt->bindParam(':profile_image', $img, PDO::PARAM_STR);
+      }
 
-        $stmt = $this->conn->prepare($sql);
+      $stmt->execute();
 
-        // Bind the parameters for bio, gender, and id
-        $stmt->bindParam(':bio', $bio, PDO::PARAM_STR);
-        $stmt->bindParam(':gender', $gender, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        // If a new image is provided, bind the image parameter
-        if ($img !== null) {
-            $stmt->bindParam(':profile_image', $img, PDO::PARAM_STR);
-        }
-
-        // Execute the query
-        $stmt->execute();
-    } catch(PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
+      return true;
+  } catch (PDOException $e) {
+      error_log("Error updating profile: " . $e->getMessage());
+      return false;
+  }
   }
 
   // Method to update email (requires password verification)
@@ -157,7 +165,7 @@ class UserModel {
       $conn = $this->connect();  // Ensure connection is established
       
       // SQL query to fetch name, email, profile_image, and password
-      $sql = "SELECT id,name, email, profile_image, bio, gender,profile_image password FROM users WHERE id = :id";
+      $sql = "SELECT id,name, email, profile_image, bio, gender,profile_image,privilege,password FROM users WHERE id = :id";
       $stmt = $conn->prepare($sql);
 
       // Bind the ID parameter
@@ -181,7 +189,8 @@ class UserModel {
       echo "Error: " . $e->getMessage();
     }
   }
-  
+
+
   public function updatePassword($id, $password, $newPassword) {
     try {
         // Establish database connection
@@ -227,7 +236,7 @@ class UserModel {
   public function isUserAdmin($id){
     try {
         $conn = $this->connect();
-        $sql = "SELECT 1 FROM users WHERE id = :id AND privilege = 'admin'";
+        $sql = "SELECT 1 FROM users WHERE id = :id AND privilege = 'admin' OR privilege = 'moderator'";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
@@ -238,6 +247,53 @@ class UserModel {
     } catch (PDOException $e) {
         error_log("Error checking admin status: " . $e->getMessage());
         return false; // Return false on failure to ensure safety.
+    }
+  }
+
+
+    public function setUserPrivilege($privilege, $userId) {
+      try {
+          $conn = $this->connect(); // Assuming you have a connect method to get the database connection
+          
+          $sql = "UPDATE users SET privilege = :privilege WHERE id = :id";
+          $stmt = $conn->prepare($sql);
+          $stmt->bindParam(':privilege', $privilege, PDO::PARAM_STR);
+          $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+
+          // Execute query
+          if ($stmt->execute()) {
+              return ["status" => "success", "message" => "Privilege updated successfully."];
+          } else {
+              throw new Exception("Failed to update privilege.");
+          }
+
+      } catch (Exception $e) {
+          // Return error message
+          return ["status" => "error", "message" => $e->getMessage()];
+      }
+  }
+
+  public function searchUsersByQuery($query) {
+      try {
+      $conn = $this->connect();
+      // Escape special characters to prevent SQL injection (optional)
+      $query = "%" . $query . "%";
+
+      // Prepare the SQL query
+      $sql = "SELECT * FROM users WHERE name LIKE :query OR email LIKE :query LIMIT 30";
+
+      // Execute the query using a prepared statement
+      $stmt = $this->conn->prepare($sql);
+      $stmt->bindParam(':query', $query, PDO::PARAM_STR);
+      $stmt->execute();
+
+      // Fetch all matching users
+      $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      return $users;
+      } catch (Exception $e) {
+        // Return error message
+        return ["status" => "error", "message" => $e->getMessage()];
     }
   }
 }

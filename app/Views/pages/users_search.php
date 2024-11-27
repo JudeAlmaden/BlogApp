@@ -26,28 +26,12 @@ if (!isset($_SESSION['id'])) {
     <!-- Navbar -->
     <?php require_once(__DIR__."/../components/navbar.php"); ?>
 
-    <div class="row my-3" style="height:600px; max-height:50vh">
-        <div class="col-12 mb-5">
-            <?php require_once(__DIR__."/../components/bootstrap_carousell.php"); ?>
-        </div>
-        
-        <div class="col-12 mb-3">
-            <?php require_once(__DIR__."/../components/bootstrap_card_grid.php"); ?>
-        </div>
-
-        <div class="col-12 px-5"><hr></div>
-
-        <div class="d-flex justify-content-center mt-4">
-            <a href="posts-lists" class="btn btn-primary rounded-pill p-3 fs-3" style="width:300px">Read More</a>
-        </div>
-
-
-        <div class="col-12">
-            <?php require_once(__DIR__."/../components/footer.php"); ?>
-        </div>
-
-        <?php require_once(__DIR__ . "/../view_error.php"); ?>
-        <?php require_once(__DIR__ . "/../view_success.php"); ?>
+    <div class="row my-3" style="height:700px; max-height:70vh">
+    <?php require_once(__DIR__ . "/../components/users_list.php"); ?>
+    </div>
+    <?php require_once(__DIR__ . "/../components/footer.php"); ?>
+    <?php require_once(__DIR__ . "/../view_error.php"); ?>
+    <?php require_once(__DIR__ . "/../view_success.php"); ?>
     </div>
 </div>
 </body>

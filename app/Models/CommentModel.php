@@ -103,8 +103,25 @@ class CommentModel {
     }
   }
 
+  public function deleteComment($comment_id){
+        try {
+            $conn = $this->connect(); // Assuming you have a method that returns the DB connection       
+            $query = "
+                DELETE FROM comments 
+                WHERE comments.id = :comment_id";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':comment_id', $comment_id, PDO::PARAM_INT);
+            
+            if ($stmt->execute()) {
+                return $stmt->rowCount() > 0;
+            }
+            
+            return false;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage(); // Handle query error
 
-
+        }
+    }
 }
 
 

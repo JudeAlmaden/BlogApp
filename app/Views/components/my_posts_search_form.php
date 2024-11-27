@@ -286,20 +286,37 @@ $(document).ready(function () {
                                             <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 250px; object-fit: cover;">
                                         </div>
                                         <div class="col-md-8"  style="height: 250px; ">
-                                            <div class="card-body">
-                                                <h5 class="card-title">${item.content.length > 30 ? item.content.substring(0, 20) + '...' : item.title}</h5>
-                                                <p class="card-text">${item.content.length > 50 ? item.content.substring(0, 150) + '...' : item.content}</p>
-                                                <p class="card-text m-0"><small class="text-muted"> Last updated: ${item.updated_at}</small></p>
-                                                <p class="card-text m-0"><small>Likes: ${item.likes}</small></p>
-                                                <small>
-                                                    Status: 
-                                                    <span class="badge ${item.status === 'published' ? 'bg-success' : 'bg-warning text-dark'}">
-                                                        ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                                                    </span>
-                                                </small>
-                                                <div class="d-flex justify-content-end">
-                                                    <a href="delete-post?id=${item.id}" class="btn btn-danger col-3 me-1" target="_blank" ><i class="fas fa-trash me-2"></i>Delete</a>
-                                                    <a href="edit-post?id=${item.id}" class="btn btn-success col-3" target="_blank" rel="noopener noreferrer"><i class="fas fa-edit me-2"></i>Edit</a>
+                                            <div class="card-body d-flex flex-column justify-content-between" style="height: 100%;">
+                                                <div>
+                                                    <h5 class="card-title">
+                                                        ${item.content.length > 30 ? item.content.substring(0, 20) + '...' : item.title}
+                                                    </h5>
+                                                    <p class="card-text">
+                                                        ${item.content.length > 50 ? item.content.substring(0, 150) + '...' : item.content}
+                                                    </p>
+                                                    <p class="card-text m-0">
+                                                        <small class="text-muted">Last updated: ${item.updated_at}</small>
+                                                    </p>
+                                                    <p class="card-text m-0">
+                                                        <small>Likes: ${item.likes}</small>
+                                                    </p>
+                                                    <small>
+                                                        Status:
+                                                        <span class="badge ${item.status === 'published' ? 'bg-success' : 'bg-warning text-dark'}">
+                                                            ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                                                        </span>
+                                                    </small>
+                                                </div>
+                                                <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
+                                                    <a href="view?id=${item.id}" class="btn btn-primary btn-m d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer">
+                                                        Read
+                                                    </a>
+                                                    <a href="delete-post?id=${item.id}" class="btn btn-danger btn-m d-flex align-items-center justify-content-center" target="_blank">
+                                                        <i class="fas fa-trash me-1"></i> Delete
+                                                    </a>
+                                                    <a href="edit-post?id=${item.id}" class="btn btn-success btn-m d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer">
+                                                        <i class="fas fa-edit me-1"></i> Edit
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>

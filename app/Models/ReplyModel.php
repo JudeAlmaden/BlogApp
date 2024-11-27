@@ -84,6 +84,27 @@ class ReplyModel {
         return false;  // Return false if there's an error
     }
   }
+
+
+  public function deleteReply($reply_id){
+    try {
+        $conn = $this->connect(); // Assuming you have a method that returns the DB connection       
+        $query = "
+            DELETE FROM replies 
+            WHERE replies.id = :reply_id";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':reply_id', $reply_id, PDO::PARAM_INT);
+        
+        if ($stmt->execute()) {
+            return $stmt->rowCount() > 0;
+        }
+        
+        return false;
+    } catch (PDOException $e) {
+        return "Error: " . $e->getMessage(); // Handle query error
+
+    }
+}
 }
 
 
