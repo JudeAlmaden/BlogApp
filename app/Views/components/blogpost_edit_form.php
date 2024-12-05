@@ -22,9 +22,8 @@
             <input type="text" class="form-control" id="category-search" placeholder="Search for a category" autocomplete="off">
             <ul id="category-list" class="list-group mt-2"></ul>
             <div class="mt-1" style="font-size:10px">
-                <span class="fw-bold">Selected Categories:</span>
+                <span class="fw-bold">Previously Selected Categories: <span id="all_categories"><?=$post['all_categories']?></span></span>
                 <div id="categories-list" class="mt-2">
-
                 </div>
             </div>
         </div>
@@ -35,7 +34,7 @@
             <input type="text" class="form-control" id="tags-search" placeholder="Search for a tag" autocomplete="off">
             <ul id="tag-list" class="list-group mt-2"></ul>
             <div class="mt-1" style="font-size:10px"></div>
-                <span class="fw-bold" style="font-size:10px">Selected Tags:</span>
+                <span class="fw-bold" style="font-size:10px">Previously Selected Tags: <span id="all_tags"><?=$post['all_tags']?></span></span>
             <div id="tags-list" class="mt-2"></div>
         </div>
 
@@ -45,21 +44,92 @@
             <input type="file" class="form-control" id="media" name="media[]" accept="image/*,video/*,audio/*" multiple>
             <small class="text-muted">You can upload images, videos, or audio files.</small>
             <div id="media-preview" class="row mt-3 gy-3">
-                <!-- Previews will appear here -->
+                <?php if (!empty($post['media_url'])): ?>
+                <!-- Carousel Container -->
+                    <div id="imageCarouselContainer">
+                        <div id="imageCarousel" class="carousel carousel-dark slide mb-4" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <?php
+                                    $images = explode(',', $post['media_url']);
+                                    $first = true; // To handle the first image active class
+                                    foreach ($images as $image): 
+                                ?>
+                                    <div class="carousel-item <?php echo $first ? 'active' : ''; ?>">
+                                        <!-- Image Thumbnail with height limit of 400px and centered -->
+                                        <img src="<?php echo htmlspecialchars($image); ?>" 
+                                            class="d-block w-100 img-fluid rounded mb-3 thumbnail-image" 
+                                            alt="Image"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#imageModal"
+                                            style="max-height: 400px; object-fit: contain; cursor: pointer;">
+                                    </div>
+                                    <?php 
+                                        $first = false;
+                                    endforeach; 
+                                ?>
+                            </div>
+                            <!-- Carousel Controls -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+
+                        <!-- Modal for Displaying Larger Image -->
+                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="imageModalLabel">Image View</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img id="modal-image" src="" alt="Large Image" class="img-fluid">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <script>
+                    // JavaScript to update the modal image source when a thumbnail is clicked
+                    const thumbnailImages = document.querySelectorAll('.thumbnail-image');
+                    thumbnailImages.forEach(image => {
+                        image.addEventListener('click', function () {
+                            const imageSrc = this.src; // Get the clicked image source
+                            document.getElementById('modal-image').src = imageSrc; // Set the modal image source
+                        });
+                    });
+
+                    // JavaScript to remove the carousel when files are selected
+                    document.getElementById('media').addEventListener('change', function () {
+                        const carouselContainer = document.getElementById('imageCarouselContainer');
+                        if (carouselContainer) {
+                            carouselContainer.remove(); // Remove the existing carousel
+                        }
+                    });
+                </script>
+                <?php endif; ?>
             </div>
         </div>
 
         <!-- Scheduled Date for Publication -->
         <div class="mb-4">
             <label for="scheduled_at" class="form-label">Schedule for Publication</label>
-            <input type="datetime-local" class="form-control" id="scheduled_at" name="scheduled_at" value="<?=$post['scheduled_at']?>">
+            <input type="datetime-local" class="form-control" id="scheduled_at" name="scheduled_at" value="<?=$post['scheduled_at']?>" >
         </div>
 
         
         <!-- Hidden Fields -->
         <div id="selected-categories-tags">
-            <input type="hidden" name="categories[]" id="categories-input" required>
-            <input type="hidden" name="tags[]" id="tags-input" required>
+            <input type="hidden" name="categories[]" id="categories-input" >
+            <input type="hidden" name="tags[]" id="tags-input" >
         </div>
 
         <!-- Submit Buttons -->
@@ -187,7 +257,8 @@ $(document).ready(function() {
         if (!tags.some(t => t.id === tag.id)) {
             tags.push({ id: tag.id, name: tag.name });
         }
-        updateSelectedTags();
+
+        updateSelectedTags();        
     }
 
     function updateSelectedTags() {
@@ -215,19 +286,6 @@ $(document).ready(function() {
         console.log(tags)
     }
 
-
-    $('form').on('submit', function(event) {
-        let categories = $('#categories-input').val(); // Get the value of the categories input
-        let tags = $('#tags-input').val(); // Get the value of the tags input
-
-        // If either categories or tags are empty, prevent the form submission
-        if (!categories || !tags || categories === "[]" || tags === "[]") {
-            event.preventDefault();  // Prevent form submission
-
-            // Display a message to the user (optional)
-            alert('Please select at least one category and one tag.');
-        }
-    });
 });
 </script>
 

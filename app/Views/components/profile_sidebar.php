@@ -1,4 +1,4 @@
-<div class="col-md-3 mt-5 p-5">
+<div class="col-md-3  p-5 border-end">
     <?php if ($user): ?>
         <div class="user-profile sticky-profile">
             <!-- Profile Avatar Image -->
@@ -52,9 +52,9 @@
                 <?php else: ?>
                     <!-- Display User Privilege Badge for Non-admin Users or Same Session -->
                     <div class="profile-item mt-4">
-                        <strong>Privilege:</strong> 
+                        <strong class="pe-1">Privilege:</strong> 
                         <span class="badge 
-                            <?php 
+                            <?php
                                 if ($user['privilege'] == 'admin') {
                                     echo 'bg-danger';  // Red for Admin
                                 } elseif ($user['privilege'] == 'moderator') {
@@ -63,7 +63,7 @@
                                     echo 'bg-secondary';  // Grey for User
                                 }
                             ?>">
-                            <?= ucfirst($user['privilege']) ?>
+                             <?= ucfirst($user['privilege']) ?>
                         </span>
                     </div>
                 <?php endif; ?>

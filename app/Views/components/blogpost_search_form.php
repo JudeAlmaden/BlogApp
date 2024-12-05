@@ -1,90 +1,131 @@
 
 <!-- Sidebar Column -->    
 <div class="col-12 mb-5 row">
-<div class="col-md-3 mb-5">
-    <div class="card p-4 shadow-sm">
-        <h4 class="mb-4">Search Blog Posts</h4>
-        <form id="search-form" action="api/get/search-posts" method="GET">
-            
-            <!-- Keyword Search Field -->
-            <div class="mb-4">
-                <label for="keyword" class="form-label">Keyword</label>
-                <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Enter keywords" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>">
-            </div>
+<div class="col-md-3 mb-5 px-5">
+<div class="card p-4 shadow-sm border-0 rounded-3">
+    <h4 class="mb-4 fw-bold text-primary">Search Blog Posts</h4>
+    <form id="search-form" action="#" method="GET">
+        
+        <!-- Keyword Search Field -->
+        <div class="mb-4">
+            <label for="keyword" class="form-label fw-semibold">Keyword</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="keyword" 
+                name="keyword" 
+                placeholder="Enter keywords"
+                value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>"
+            >
+        </div>
 
-            <!-- Author -->
-            <div class="mb-4">
-                <label for="keyword" class="form-label">Author</label>
-                <input type="text" class="form-control" id="author" name="author" placeholder="Enter name" value="<?php echo isset($_GET['author']) ? htmlspecialchars($_GET['author']) : ''; ?>">
-            </div>
+        <!-- Author Search -->
+        <div class="mb-4">
+            <label for="author" class="form-label fw-semibold">Author</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="author" 
+                name="author" 
+                placeholder="Enter author's name"
+                value="<?php echo isset($_GET['author']) ? htmlspecialchars($_GET['author']) : ''; ?>"
+            >
+        </div>
 
-            <!-- Category Filter -->
-            <div class="mb-4">
-            <label for="category-search" class="form-label">Category</label>
-            <input type="text" class="form-control" id="category-search" placeholder="Search for a category" autocomplete="off">
+        <!-- Category Filter -->
+        <div class="mb-4">
+            <label for="category-search" class="form-label fw-semibold">Category</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="category-search" 
+                placeholder="Search for a category" 
+                autocomplete="off"
+            >
             <ul id="category-list" class="list-group mt-2"></ul>
-            <div class="mt-1" style="font-size:10px">
+            <div class="mt-2 small">
                 <span class="fw-bold">Selected Categories:</span>
-                <div id="categories-list" class="mt-2"></div>
+                <div id="categories-list"></div>
             </div>
         </div>
 
         <!-- Tags Selection -->
         <div class="mb-4">
-            <label for="tags-search" class="form-label">Tags</label>
-            <input type="text" class="form-control" id="tags-search" placeholder="Search for a tag" autocomplete="off">
-            <ul id="tag-list" class="list-group" style="font-size:40"></ul>
-            <div class="mt-1" style="font-size:10px">
+            <label for="tags-search" class="form-label fw-semibold">Tags</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="tags-search" 
+                placeholder="Search for a tag" 
+                autocomplete="off"
+            >
+            <ul id="tag-list" class="list-group mt-2"></ul>
+            <div class="mt-2 small">
                 <span class="fw-bold">Selected Tags:</span>
-                <div id="tags-list" class="mt-2"></div>
+                <div id="tags-list"></div>
             </div>
         </div>
 
-        <div class="col-12 px-5"><hr></div>
+        <hr class="my-4">
 
         <!-- Date Range Filter -->
         <div class="mb-4">
-            <label for="date-from" class="form-label">Date Range</label>
-            <div class="d-flex gap-2 flex-wrap">
-                <input type="date" class="form-control flex-grow-1 " id="date-from" name="date_from" value="<?php echo isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from']) : ''; ?>">
-                <span class="text-center d-flex align-items-center text-center col-xs-12">to</span>
-                <input type="date" class="form-control flex-grow-1 " id="date-to" name="date_to" value="<?php echo isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to']) : ''; ?>">
+            <label class="form-label fw-semibold">Date Range</label>
+            <div class="d-flex gap-2 align-items-center">
+                <input 
+                    type="date" 
+                    class="form-control form-control-sm w-50" 
+                    id="date-from" 
+                    name="date_from"
+                    value="<?php echo isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from']) : ''; ?>"
+                >
+                <span class="small">to</span>
+                <input 
+                    type="date" 
+                    class="form-control form-control-sm w-50" 
+                    id="date-to" 
+                    name="date_to"
+                    value="<?php echo isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to']) : ''; ?>"
+                >
             </div>
         </div>
 
-        <div id="selected-categories-tags">
-            <input type="hidden" name="categories[]" id="categories-input">
-            <input type="hidden" name="tags[]" id="tags-input">
+        <hr class="my-4">
+
+        <!-- Sorting Options -->
+        <div class="mb-4">
+            <label for="sort-by" class="form-label fw-semibold">Sort By</label>
+            <select id="sort-by" name="sort_by" class="form-select">
+                <option value="date">Date</option>
+                <option value="likes">Likes</option>
+            </select>
         </div>
 
-        <div class="col-12 px-5"><hr></div>
-
-        <div class="mb-3">
-            <div class="form-group">
-                <label for="sort-by" class="form-label">Sort By:</label>
-                <select id="sort-by" name="sort_by" class="form-control">
-                    <option value="date">Date</option>
-                    <option value="likes">Likes</option>
-                </select>
-            </div>
-
-            <div class="form-group mt-2">
-                <label for="sort-order" class="form-label">Order:</label>
-                <select id="sort-order" name="sort_order" class="form-control">
-                    <option value="desc">Descending</option>
-                    <option value="asc">Ascending</option>
-                </select>
-            </div>
+        <div class="mb-4">
+            <label for="sort-order" class="form-label fw-semibold">Order</label>
+            <select id="sort-order" name="sort_order" class="form-select">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+            </select>
         </div>
-        
-        <!-- Submit Button -->
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary" id="search-btn">Search</button>
+
+        <!-- Search Button -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Search</button>
         </div>
-        </form>
-    </div>
+    </form>
 </div>
-<div class="col-8"  id="results"></div>
+
+</div>
+<div class="col-md-8 border-start">
+    <div class="content-section p-4">
+        <h2 class="text-center fw-bold mb-4">Your Blog Posts</h2>
+
+        <!-- Display Posts -->
+        <div id="results" class="row gy-4 px-2">
+            <!-- Dynamic Post Items will be injected here -->
+        </div>
+    </div>
 </div>
 
 
@@ -244,7 +285,7 @@ $(document).ready(function () {
 
         if(!isQuerying){
             $.ajax({
-                url: $('#search-form').attr('action'), // Form's action URL
+                url: "api/get/search-posts", // Form's action URL
                 method: 'GET',
                 data: formData,
                 complete: function () {
@@ -269,35 +310,85 @@ $(document).ready(function () {
                     data.forEach(function (item) {
                         const imagePath = item.file_path
                             ? item.file_path
-                            : "https://via.placeholder.com/600x250"
-                        
-                            const resultCard = `
-                                <div class="card mb-3 d-flex flex-align-center mb-2">
-                                    <div class="row g-0">
-                                        <div class="col-md-4">
-                                            <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 250px; object-fit: cover;">
-                                        </div>
-                                        <div class="col-md-8"  style="height: 250px; ">
-                                            <div class="card-body">
-                                                <h5 class="card-title">${item.content.length > 30 ? item.content.substring(0, 20) + '...' : item.title}</h5>
-                                                <p class="card-text">${item.content.length > 50 ? item.content.substring(0, 150) + '...' : item.content}</p>
-                                                <p class="card-text m-0"><small class="text-muted">Author:
-                                                    <a href="view-profile?id=${item.user_id}" style="text-decoration:none"> ${item.name}</a>
-                                                </p>
-                                                <p class="card-text m-0"><small class="text-muted">Last updated: ${item.updated_at}</small></p>
-                                                <p class="card-text m-0"><small>Likes: ${item.likes}</small></p>
-                                                <p class="card-text my-0"><small>Tags: ${item.all_tags}</small></p>
-                                                <p class="card-text my-0"><small>Categories: ${item.all_categories}</small></p>
-                                                <div class="d-flex justify-content-end">
-                                                    <a href="view?id=${item.id}" class="btn btn-primary col-3" target="_blank" rel="noopener noreferrer">Read</a>
-                                                </div>
+                            : ""; // Removed placeholder image for posts without images
+
+                        // Profile image with fallback
+                        const profileImage = item.profile 
+                            ? item.profile 
+                            : "https://i.pinimg.com/originals/c0/27/be/c027bec07c2dc08b9df60921dfd539bd.webp";  // Placeholder image for profile
+
+                        // Build the result card dynamically
+                        const resultCard = `
+                        <div class="card shadow-lg rounded-4 overflow-hidden mb-4" style="border: none; background-color: #f9f9f9;">
+                            <div class="row g-0">
+                                <!-- Left Column: Post Image (only if there's an image) -->
+                                ${imagePath ? `
+                                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                                    <img src="${imagePath}" class="img-fluid rounded-start" alt="Post Thumbnail" 
+                                        style="width: 100%; height: 250px; object-fit: cover;">
+                                </div>
+                                ` : ''}
+
+                                <!-- Right Column: Post Details -->
+                                <div class=" d-flex flex-column p-3">
+                                    <div class="card-body d-flex flex-column justify-content-between" style="height: 100%;">
+
+                                        <!-- Post Title -->
+                                        <h5 class="card-title mb-3" style="font-size: 1.75rem; font-weight: bold; color: #333;">
+                                            ${item.title.length > 60 ? item.title.substring(0, 60) + '...' : item.title}
+                                        </h5>
+
+                                        <!-- Post Content Preview -->
+                                        <p class="card-text mb-3" style="color: #555; font-size: 1rem; line-height: 1.6;">
+                                            ${item.content.length > 250 ? item.content.substring(0, 250) + '...' : item.content}
+                                        </p>
+
+                                        <!-- Author Info & Date -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3" style="font-size: 0.9rem; color: #888;">
+                                            <!-- Author -->
+                                            <div class="d-flex align-items-center">
+                                                <img src="${profileImage}" class="rounded-circle" alt="Profile" 
+                                                    style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                                <a href="view-profile?id=${item.user_id}" 
+                                                style="text-decoration: none; font-weight: bold; color: #007bff;">
+                                                    ${item.name}
+                                                </a>
                                             </div>
+                                            
+                                            <!-- Post Date -->
+                                            <small>${item.published_at}</small>
+                                        </div>
+                                        
+                                        <!-- Post Stats (Likes, Tags, Categories) -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3" style="font-size: 0.9rem; color: #888;">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge badge-light text-muted" style="font-size: 0.9rem; margin-right: 8px;">
+                                                    <i class="fas fa-thumbs-up"></i> ${item.likes}
+                                                </span>
+                                                <span class="badge badge-light text-muted" style="font-size: 0.9rem; margin-right: 8px;">
+                                                    <i class="fas fa-tag"></i> ${item.all_tags}
+                                                </span>
+                                                <span class="badge badge-light text-muted" style="font-size: 0.9rem;">
+                                                    <i class="fas fa-folder"></i> ${item.all_categories}
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- Read More Button -->
+                                            <a href="view?id=${item.id}" class="btn btn-outline-primary btn-sm" 
+                                            target="_blank" rel="noopener noreferrer" 
+                                            style="font-weight: bold; padding: 5px 15px; border-radius: 20px; transition: all 0.3s;">
+                                                Read More
+                                            </a>
                                         </div>
                                     </div>
-                                </div>`;
+                                </div>
+                            </div>
+                        </div>
+                        `;
+
+                        // Append the result card to the results container
                         $('#results').append(resultCard);
-                    });
-                },
+                    });                },
                 error: function (xhr, status, error) {
                     console.error('Error fetching results:', error);
                     const errorCard = `

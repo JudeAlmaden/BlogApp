@@ -10,24 +10,79 @@ require_once("app/Controllers/Categories_Controller.php");
 require_once("app/utils/sanitize.php");
 require_once("router.php");
 
-session_set_cookie_params([
-    'lifetime' => 0,  // Session cookie expires when the browser is closed
-    'path' => '/',    // Set to '/' to allow the cookie across the entire domain
-]);
 
-session_start();
-
-// Set the session timeout limit (in seconds)
-$session_timeout = 30 * 60; 
-
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
-    // Session has expired, destroy the session
-    session_unset();  // Unset all session variables
-    session_destroy(); // Destroy the session
-    header("Location: login.php"); // Redirect to login page (or your preferred page)
-    exit(); // Stop further script execution
+function secureSessionRegeneration() {
+    if (!isset($_SESSION['regenerated'])) {
+        session_regenerate_id(true); // Replace the session ID and delete the old one
+        $_SESSION['regenerated'] = time();
+    } elseif (time() - $_SESSION['regenerated'] > 300) { // Regenerate every 5 minutes
+        session_regenerate_id(true);
+        $_SESSION['regenerated'] = time();
+    }
 }
 
+function validateSession() {
+    $currentUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $currentIp = $_SERVER['REMOTE_ADDR'] ?? '';
+
+    if (!isset($_SESSION['user_agent'])) {
+        $_SESSION['user_agent'] = $currentUserAgent;
+    } elseif ($_SESSION['user_agent'] !== $currentUserAgent) {
+        session_unset();
+        session_destroy();
+        header('Location: login.php'); // Redirect to login
+        exit();
+    }
+
+    if (!isset($_SESSION['ip_address'])) {
+        $_SESSION['ip_address'] = $currentIp;
+    } elseif ($_SESSION['ip_address'] !== $currentIp) {
+        session_unset();
+        session_destroy();
+        header('Location: login.php');
+        exit();
+    }
+}
+
+function enforceSessionTimeout($timeout = 1800) { // Default timeout: 30 minutes
+    if (!isset($_SESSION['last_activity'])) {
+        $_SESSION['last_activity'] = time();
+    } elseif (time() - $_SESSION['last_activity'] > $timeout) {
+        session_unset();
+        session_destroy();
+        header('Location: login.php'); // Redirect to login
+        exit();
+    }
+    $_SESSION['last_activity'] = time();
+}
+
+function destroySession() {
+    session_unset();   // Unset all session variables
+    session_destroy(); // Destroy the session data on the server
+
+    // Delete the session cookie
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+    }
+}
+
+// Secure session configuration and management
+$cookieParams = [
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => $_SERVER['HTTP_HOST'],
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Strict',
+];
+
+session_set_cookie_params($cookieParams);
+session_start();
+
+secureSessionRegeneration();
+validateSession();
+enforceSessionTimeout();
 
 // Create a new Router instance
 $router = new Router();

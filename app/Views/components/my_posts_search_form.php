@@ -1,98 +1,136 @@
 
 <!-- Sidebar Column -->
-<div class="col-12 mb-5 row">
-<div class="col-md-3 mb-5">
-    <div class="card p-4 shadow-sm" style="z-index: 10; ">
-        <h4 class="mb-4"> Filters</h4>
+<div class="col-12 mb-5 row ">
+<div class="col-md-3 mb-5 px-4">
+    <div class="card p-4 shadow-lg border-0 rounded-3">
+        <h4 class="mb-4 fw-bold text-center">Filters</h4>
+
         <form id="search-form" action="api/get/my-posts/search" method="GET">
-            
-            <!-- Keyword Search Field -->
+
+            <!-- Keyword Search -->
             <div class="mb-4">
-                <label for="keyword" class="form-label">Keyword</label>
-                <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Enter keywords" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>">
+                <label for="keyword" class="form-label fw-semibold">Search by Keyword</label>
+                <input 
+                    type="text" 
+                    class="form-control shadow-sm" 
+                    id="keyword" 
+                    name="keyword" 
+                    placeholder="Type keywords here" 
+                    value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>">
             </div>
 
             <!-- Category Filter -->
             <div class="mb-4">
-            <label for="category-search" class="form-label">Category</label>
-            <input type="text" class="form-control" id="category-search" placeholder="Search for a category" autocomplete="off">
-            <ul id="category-list" class="list-group mt-2"></ul>
-            <div class="mt-1" style="font-size:10px">
-                <span class="fw-bold">Selected Categories:</span>
-                <div id="categories-list" class="mt-2"></div>
+                <label for="category-search" class="form-label fw-semibold">Filter by Category</label>
+                <input 
+                    type="text" 
+                    class="form-control shadow-sm" 
+                    id="category-search" 
+                    placeholder="Search for categories" 
+                    autocomplete="off">
+                <ul id="category-list" class="list-group mt-2 shadow-sm"></ul>
+                <div class="mt-2">
+                    <strong>Selected Categories:</strong>
+                    <div id="categories-list" class="badge-container mt-2"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Tags Selection -->
-        <div class="mb-4">
-            <label for="tags-search" class="form-label">Tags</label>
-            <input type="text" class="form-control" id="tags-search" placeholder="Search for a tag" autocomplete="off">
-            <ul id="tag-list" class="list-group" style="font-size:40"></ul>
-            <div class="mt-1" style="font-size:10px">
-                <span class="fw-bold">Selected Tags:</span>
-                <div id="tags-list" class="mt-2"></div>
+            <!-- Tag Filter -->
+            <div class="mb-4">
+                <label for="tags-search" class="form-label fw-semibold">Filter by Tags</label>
+                <input 
+                    type="text" 
+                    class="form-control shadow-sm" 
+                    id="tags-search" 
+                    placeholder="Search for tags" 
+                    autocomplete="off">
+                <ul id="tag-list" class="list-group mt-2 shadow-sm"></ul>
+                <div class="mt-2">
+                    <strong>Selected Tags:</strong>
+                    <div id="tags-list" class="badge-container mt-2"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="col-12 px-5"><hr></div>
-
-        <!-- Date Range Filter -->
-        <div class="mb-4">
-            <label for="date-from" class="form-label">Date Range</label>
-            <div class="d-flex gap-2 flex-wrap">
-                <input type="date" class="form-control flex-grow-1 " id="date-from" name="date_from" value="<?php echo isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from']) : ''; ?>">
-                <span class="text-center d-flex align-items-center text-center col-xs-12">to</span>
-                <input type="date" class="form-control flex-grow-1 " id="date-to" name="date_to" value="<?php echo isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to']) : ''; ?>">
+            <!-- Date Range Filter -->
+            <div class="mb-4">
+                <label for="date-from" class="form-label fw-semibold">Filter by Date Range</label>
+                <div class="d-flex gap-2 flex-wrap">
+                    <input 
+                        type="date" 
+                        class="form-control shadow-sm flex-grow-1" 
+                        id="date-from" 
+                        name="date_from" 
+                        value="<?php echo isset($_GET['date_from']) ? htmlspecialchars($_GET['date_from']) : ''; ?>">
+                    <span class="align-self-center">to</span>
+                    <input 
+                        type="date" 
+                        class="form-control shadow-sm flex-grow-1" 
+                        id="date-to" 
+                        name="date_to" 
+                        value="<?php echo isset($_GET['date_to']) ? htmlspecialchars($_GET['date_to']) : ''; ?>">
+                </div>
             </div>
-        </div>
 
-        <div id="selected-categories-tags">
-            <input type="hidden" name="categories[]" id="categories-input">
-            <input type="hidden" name="tags[]" id="tags-input">
-        </div>
-
-        <div class="col-12 px-5"><hr></div>
-
-        <div class="mb-3">
-            <div class="form-group">
-                <label for="sort-by" class="form-label">Sort By:</label>
-                <select id="sort-by" name="sort_by" class="form-control">
+            <!-- Sort Options -->
+            <div class="mb-4">
+                <label for="sort-by" class="form-label fw-semibold">Sort By</label>
+                <select 
+                    id="sort-by" 
+                    name="sort_by" 
+                    class="form-control shadow-sm">
                     <option value="date">Date</option>
                     <option value="likes">Likes</option>
                 </select>
             </div>
 
-            <div class="form-group mt-2">
-                <label for="sort-order" class="form-label">Order:</label>
-                <select id="sort-order" name="sort_order" class="form-control">
+            <!-- Sort Order -->
+            <div class="mb-4">
+                <label for="sort-order" class="form-label fw-semibold">Order</label>
+                <select 
+                    id="sort-order" 
+                    name="sort_order" 
+                    class="form-control shadow-sm">
                     <option value="desc">Descending</option>
                     <option value="asc">Ascending</option>
                 </select>
             </div>
 
-            
-            <div class="form-group mt-2">
-                <label for="sort-order" class="form-label">Status:</label>
-                <select id="sort-order" name="status" class="form-control">
+            <!-- Status Filter -->
+            <div class="mb-4">
+                <label for="status" class="form-label fw-semibold">Post Status</label>
+                <select 
+                    id="status" 
+                    name="status" 
+                    class="form-control shadow-sm">
                     <option value="">Any</option>
                     <option value="Draft">Draft</option>
                     <option value="Published">Published</option>
                 </select>
             </div>
-        </div>
-        
-        <!-- Submit Button -->
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary" id="search-btn">Search</button>
-        </div>
+
+            <!-- Hidden Fields -->
+            <div id="selected-categories-tags" class="d-none">
+                <input type="hidden" name="categories[]" id="categories-input">
+                <input type="hidden" name="tags[]" id="tags-input">
+            </div>
+
+            <!-- Search Button -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary shadow-sm">Apply Filters</button>
+            </div>
         </form>
     </div>
 </div>
-    <div class="col-8">
-        <h2 class="text-center">Here are your posts</h2>
-        <div class="col-12"  id="results">
+<div class="col-md-8">
+    <div class="content-section card border-0 shadow-lg p-4 rounded-3">
+        <h2 class="text-center fw-bold mb-4">Your Blog Posts</h2>
+
+        <!-- Display Posts -->
+        <div id="results" class="row gy-4 px-2">
+            <!-- Dynamic Post Items will be injected here -->
         </div>
     </div>
+</div>
 </div>
 
 <script>
@@ -280,7 +318,7 @@ $(document).ready(function () {
                             : "https://via.placeholder.com/600x250"; // Default image if file_path is empty
                         
                             const resultCard = `
-                                <div class="card mb-3 d-flex flex-align-center mb-5">
+                                <div class="card mb-3 d-flex flex-align-center mb-5 p-0">
                                     <div class="row g-0">
                                         <div class="col-md-4">
                                             <img src="${imagePath}" class="img-fluid rounded-start" alt="Thumbnail" style="width: 600px; height: 250px; object-fit: cover;">
@@ -289,7 +327,7 @@ $(document).ready(function () {
                                             <div class="card-body d-flex flex-column justify-content-between" style="height: 100%;">
                                                 <div>
                                                     <h5 class="card-title">
-                                                        ${item.content.length > 30 ? item.content.substring(0, 20) + '...' : item.title}
+                                                        ${item.title.length > 50 ? item.title.substring(0, 50) + '...' : item.title}
                                                     </h5>
                                                     <p class="card-text">
                                                         ${item.content.length > 50 ? item.content.substring(0, 150) + '...' : item.content}

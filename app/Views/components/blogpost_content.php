@@ -5,80 +5,78 @@
 <?php else: ?>
 
 
-    
     <div class="container mt-5">
-        <div class="blog-post border rounded p-4 shadow-lg">
-            <?php if ($isAdmin): ?>
-                <div class="d-flex justify-content-end">
-                    <a href="delete-post?id=<?php echo $post_id; ?>" class="text-secondary small" style="margin-right:0px;" onclick="return confirm('Are you sure you want to delete this post?');">
-                        <i class="fas fa-trash me-1"></i>Delete
-                    </a>
-                </div>
-            <?php endif; ?>
-
-            <!-- Blog Title -->
-            <h1 class="post-title mb-4"><?= htmlspecialchars($post['title']); ?></h1>
-
-            <!-- Post Meta (Author and Date) -->
-            <p class="post-meta text-muted mb-4">
-                <small>Published on <?= date('F j, Y', strtotime($post['created_at'])); ?> by <a href="view-profile?id=<?=$post['user_id']?>"><strong><?= htmlspecialchars($post['author']); ?></strong></a></small>
-            </p>
-
-
-            <!-- Tags -->
-            <?php if (!empty($post['all_tags'])): ?>
-                <div class="post-tags">
-                    <strong>Tags:</strong>
-                    <?php
-                        $tags = explode(',', $post['all_tags']);
-                        echo implode(', ', array_map('htmlspecialchars', $tags));
-                    ?>
-                </div>
-            <?php endif; ?>
-
-            <!-- Categories -->
-            <?php if (!empty($post['all_categories'])): ?>
-                <div class="post-categories mb-3">
-                    <strong>Categories:</strong>
-                    <?php
-                        $categories = explode(',', $post['all_categories']);
-                        echo implode(', ', array_map('htmlspecialchars', $categories));
-                    ?>
-                </div>
-            <?php endif; ?>
-
-            <!-- Post Content -->
-            <div class="content-wrapper ">
-                <div class="post-content mb-4 border-start ps-5 border-dark pl-3">
-                    <p><?= nl2br(htmlspecialchars($post['content'])); ?></p>
-                </div>
+    <div class="blog-post border rounded-4 p-5 shadow-lg bg-white">
+        <?php if ($isAdmin): ?>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="delete-post?id=<?php echo $post_id; ?>" class="text-danger small" 
+                   onclick="return confirm('Are you sure you want to delete this post?');">
+                    <i class="fas fa-trash me-1"></i> Delete
+                </a>
             </div>
+        <?php endif; ?>
 
-            <!-- Images -->
-            <?php if (!empty($post['media_url'])): ?>
-            <!-- Carousel Container -->
+        <!-- Blog Title -->
+        <h1 class="post-title mb-4" style="font-size: 2rem; font-weight: 600; color: #333;">
+            <?= htmlspecialchars($post['title']); ?>
+        </h1>
+
+        <!-- Post Meta (Author and Date) -->
+        <p class="post-meta text-muted mb-4" style="font-size: 1rem;">
+            <small>Published on <?= date('F j, Y', strtotime($post['created_at'])); ?> by 
+                <a href="view-profile?id=<?=$post['user_id']?>" style="text-decoration: none; font-weight: bold; color: #007bff;">
+                    <?= htmlspecialchars($post['author']); ?>
+                </a>
+            </small>
+        </p>
+
+        <!-- Tags -->
+        <?php if (!empty($post['all_tags'])): ?>
+            <div class="post-tags mb-3">
+                <strong>Tags:</strong>
+                <span class="badge bg-light text-muted ms-2"><?= implode('</span><span class="badge bg-light text-muted ms-2">', explode(',', $post['all_tags'])); ?></span>
+            </div>
+        <?php endif; ?>
+
+        <!-- Categories -->
+        <?php if (!empty($post['all_categories'])): ?>
+            <div class="post-categories mb-3">
+                <strong>Categories:</strong>
+                <span class="badge bg-light text-muted ms-2"><?= implode('</span><span class="badge bg-light text-muted ms-2">', explode(',', $post['all_categories'])); ?></span>
+            </div>
+        <?php endif; ?>
+
+        <!-- Post Content -->
+        <div class="content-wrapper mb-4">
+            <div class="post-content border-start ps-4" style="border-color: #007bff;">
+                <p class="lead" style="line-height: 1.8; color: #555;">
+                    <?= nl2br(htmlspecialchars($post['content'])); ?>
+                </p>
+            </div>
+        </div>
+
+        <!-- Images (Carousel) -->
+        <?php if (!empty($post['media_url'])): ?>
             <div id="imageCarousel" class="carousel carousel-dark slide mb-4" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php
                         $images = explode(',', $post['media_url']);
-                        $first = true; // To handle the first image active class
+                        $first = true; 
                         foreach ($images as $image): 
                     ?>
                         <div class="carousel-item <?php echo $first ? 'active' : ''; ?>">
-                            <!-- Image Thumbnail with height limit of 400px and centered -->
                             <img src="<?php echo htmlspecialchars($image); ?>" 
-                                class="d-block w-100 img-fluid rounded mb-3 thumbnail-image" 
-                                alt="Image"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#imageModal"
-                                style="max-height: 400px; object-fit: contain; cursor: pointer;">
+                                 class="d-block w-100 img-fluid rounded mb-3 thumbnail-image" 
+                                 alt="Image"
+                                 data-bs-toggle="modal" 
+                                 data-bs-target="#imageModal"
+                                 style="max-height: 400px; object-fit: contain; cursor: pointer;">
                         </div>
                         <?php 
                             $first = false;
                         endforeach; 
                     ?>
                 </div>
-                <!-- Carousel Controls -->
                 <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
@@ -89,7 +87,7 @@
                 </button>
             </div>
 
-            <!-- Modal for Displaying Larger Image -->
+            <!-- Modal for Larger Image -->
             <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -108,29 +106,34 @@
             </div>
 
             <script>
-                // JavaScript to update the modal image source when a thumbnail is clicked
+                // Update the modal image source when a thumbnail is clicked
                 const thumbnailImages = document.querySelectorAll('.thumbnail-image');
                 thumbnailImages.forEach(image => {
                     image.addEventListener('click', function () {
-                        const imageSrc = this.src; // Get the clicked image source
-                        document.getElementById('modal-image').src = imageSrc; // Set the modal image source
+                        const imageSrc = this.src;
+                        document.getElementById('modal-image').src = imageSrc;
                     });
                 });
             </script>
-            <?php endif; ?>
+        <?php endif; ?>
 
-            <!-- Like Button and Like Count -->
-            <div class="like-section col-12 d-flex justify-content-end align-items-center mb-4">
-                <!-- Like Count -->
-                <span id="like-count" class="mx-2"><?= $post['likes']; ?> Likes</span>
+        <!-- Like Section -->
+        <div class="like-section d-flex justify-content-between align-items-center mt-4">
+            <div class="like-count">
+                <span id="like-count" class="badge bg-light text-muted"><?= $post['likes']; ?> Likes</span>
+            </div>
 
-                <!-- Like Button -->
-                <button class="btn btn-outline-primary" id="like-button" onclick="toggleLike(<?= $post['id']; ?>)" style="width: 100px;">
+            <div class="like-button">
+                <button class="btn btn-outline-primary" id="like-button" onclick="toggleLike(<?= $post['id']; ?>)" 
+                        style="font-weight: bold; transition: all 0.3s; border-radius: 20px;">
                     <i class="fa fa-thumbs-up"></i> Like
                 </button>
             </div>
         </div>
     </div>
+</div>
+
+
 
 <?php endif; ?>
 

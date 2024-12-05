@@ -21,16 +21,16 @@
     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
   </div>
   <div class="carousel-inner">    
-    <div class="carousel-item active">
+    <div class="carousel-item ">
       <img src="https://www.typingpal.com/user/pages/04.nouvelles/lorem-ipsum-le-texte-factice-par-excellence/lorem-ipsum@2x.png" class="d-block w-100 img-fluid" alt="Slide 1">
     </div>
     <div class="carousel-item">
       <img src="https://img.freepik.com/premium-vector/vector-poster-illustration-write-what-you-feel_4968-1261.jpg?w=2000" class="d-block w-100 img-fluid" alt="Slide 2">
     </div>
-    <div class="carousel-item">
+    <div class="carousel-item" >
       <img src="https://pray.gelorailmu.com/wp-content/uploads/2020/01/21-free-banner-templates-for-photoshop-and-illustrator-regarding-free-website-banner-templates-download.jpg" class="d-block w-100 img-fluid" alt="Slide 3">
     </div>
-    <div class="carousel-item">
+    <div class="carousel-item active">
       <img src="https://i1.wp.com/365webresources.com/wp-content/uploads/2018/07/Banners-Collection-For-Sketch.png?ssl=1" class="d-block w-100 img-fluid" alt="Slide 4">
     </div>
   </div>

@@ -1,106 +1,143 @@
 <div class="container mt-4">
     <!-- Comment Section -->
-     
-    <h4 class="mb-3">Comments</h4>
+    <h4 class="mb-3" style="font-size: 1.75rem; font-weight: bold;">Comments</h4>
+    
     <!-- Comment Form -->
     <div class="mb-3 p-4 border rounded shadow-sm bg-light">
-        <h5 class="mb-4">Leave a Comment</h5>
+        <h5 class="mb-4" style="font-size: 1.5rem; font-weight: bold;">Leave a Comment</h5>
         <form id="commentForm" action="#" method="POST">
             <div class="d-flex align-items-center mb-3">
                 <!-- User Avatar -->
                 <?php if (empty($user['profile_image'])): ?>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white me-3" style="width: 50px; height: 50px; font-size: 10px;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white me-3" style="width: 50px; height: 50px; font-size: 5px; text-transform: uppercase;">
                         No Image
                     </div>
                 <?php else: ?>
-                    <img src="<?=$user['profile_image']?>" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                    <img src="<?=$user['profile_image']?>" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                 <?php endif; ?>
 
                 <!-- User Info -->
                 <div>
-                    <h6 class="mb-0"><?=$user['name']?></h6>
-                    <small class="text-muted">You are commenting as <?=$user['name']?></small>
+                    <h6 class="mb-0" style="font-size: 1.1rem; font-weight: 600;"><?= $user['name'] ?></h6>
+                    <small class="text-muted" style="font-size: 0.9rem;">You are commenting as <?= $user['name'] ?></small>
                 </div>
             </div>
 
             <!-- Comment Input Section -->
             <div class="mb-3">
-                <label for="comment" class="form-label">Comment</label>
-                <textarea id="comment" class="form-control" rows="3" placeholder="Write your comment here" name="comment" required></textarea>
+                <label for="comment" class="form-label" style="font-weight: 600; font-size: 1rem;">Comment</label>
+                <textarea id="comment" class="form-control shadow-sm" rows="3" placeholder="Write your comment here" name="comment" required style="border-radius: 10px;"></textarea>
             </div>
 
             <input type="hidden" name="id" value="<?= htmlspecialchars($post['id'], ENT_QUOTES) ?>">
-            
+
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+            <button type="submit" class="btn btn-primary mb-3 shadow-sm" style="border-radius: 25px; padding: 10px 25px; font-size: 1rem; font-weight: 600; transition: all 0.3s ease;">
+                Submit
+            </button>
         </form>
 
         <!-- Response Message Section -->
         <div id="responseMessage"></div>
 
-
-        <!-- Optional: For better styling or effects, consider adding success/failure alert styles -->
-        <style>
-            .p-4 {
-                background-color: #f9f9f9;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            }
-
-            .btn-primary {
-                width: 100%;
-            }
-
-            #responseMessage {
-                margin-top: 20px;
-            }
-
-            .alert {
-                font-size: 14px;
-            }
-
-
-            .comment {
-                background-color: #f9f9f9;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            }
-
-            .btn-link {
-                color: #007bff;
-                font-size: 14px;
-            }
-
-            .btn-link:hover {
-                text-decoration: underline;
-            }
-
-            .replies {
-                margin-left: 20px;
-            }
-
-            .replyForm {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .card-body {
-                padding: 15px;
-                border-radius: 8px;
-                background-color: #f1f1f1;
-            }
-
-            .replyForm textarea {
-                resize: none;
-                margin-bottom: 10px;
-            }
-
-            .btn-secondary {
-                align-self: flex-start;
-            }
-        </style>
-
-        <div id="commentsContainer" class="row">    <!-- Comments Here  --></div>
+        <div id="commentsContainer" class="row mt-4">
+            <!-- Comments will be injected here -->
+        </div>
     </div>
 </div>
+
+<style>
+    /* General styling */
+    .p-4 {
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #responseMessage {
+        margin-top: 20px;
+    }
+
+    .alert {
+        font-size: 14px;
+    }
+
+    /* Comment Styling */
+    .comment {
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    /* Styling for the "Reply" button */
+    .btn-link {
+        color: #007bff;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Replies Section */
+    .replies {
+        margin-left: 20px;
+    }
+
+    /* Reply Form Styling */
+    .replyForm {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-body {
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f1f1f1;
+    }
+
+    .replyForm textarea {
+        resize: none;
+        margin-bottom: 10px;
+    }
+
+    .btn-secondary {
+        align-self: flex-start;
+    }
+
+    /* Styling for the Avatar */
+    .rounded-circle {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+    }
+
+    /* Comment Text Area Styling */
+    .form-control {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        border-color: #007bff;
+    }
+
+    /* Submit Button Hover Effect */
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    /* Larger Comment Section Text */
+    h5 {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+</style>
+
 
 <script>
 $(document).ready(function() {

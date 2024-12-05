@@ -2,7 +2,50 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm rounded">
   <div class="container-fluid">
     <!-- Logo -->
-    <a class="navbar-brand fw-bold fs-3 ps-3" href="#">Blog App</a>
+    <a 
+    class="navbar-brand fw-bold fs-3 d-flex align-items-center" 
+    href="homepage"
+    style="font-family: 'Poppins', sans-serif; color: #2C3E50;"
+    >
+    <span 
+        class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-3" 
+        style="width: 50px; height: 50px; font-size: 1.5rem;"
+    >
+        WS
+    </span>
+    <span>
+        Write<span class="text-primary">Sphere</span>
+    </span>
+    </a>
+
+  <!-- Search Form -->
+  <div class="nav-item d-flex align-items-center w-100">
+    <form action="search-users" method="GET" class="d-flex w-100">
+      <div class="input-group w-100">
+        <input 
+          type="text" 
+          name="query" 
+          id="search-query" 
+          class="form-control border-0 rounded-pill shadow-sm px-3" 
+          placeholder="Search Authors..." 
+          aria-label="Search Authors"
+          style="transition: all 0.3s ease; background-color: #f8f9fa;"
+          onfocus="this.style.backgroundColor='#ffffff'; this.style.boxShadow='0 0 10px rgba(0, 123, 255, 0.5)';" 
+          onblur="this.style.backgroundColor='#f8f9fa'; this.style.boxShadow='none';"
+        >
+        <button 
+          type="submit" 
+          class="btn btn-primary rounded-pill ms-2 px-4 py-2 shadow-sm" 
+          style="transition: all 0.3s ease; background-color: #007bff; border: none; font-size: 14px;"
+          onmouseover="this.style.backgroundColor='#0056b3';" 
+          onmouseout="this.style.backgroundColor='#007bff';"
+        >
+          <i class="fas fa-search"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+
 
     <!-- Toggle button for mobile view -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -10,7 +53,7 @@
     </button>
 
     <!-- Navbar Links -->
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse col-4" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <!-- Home Link -->
         <li class="nav-item">
@@ -24,20 +67,6 @@
         <li class="nav-item">
           <a class="nav-link fs-5" id="view-posts-link" href="posts-lists">View Posts</a>
         </li>
-        <!-- My Posts Link -->
-        <li class="nav-item">
-          <a class="nav-link fs-5" id="my-posts-link" href="my-posts">My Posts</a>
-        </li>
-
-        <!-- Search Form -->
-        <li class="nav-item d-flex align-items-center">
-          <form action="search-users" method="GET" class="d-flex w-auto">
-            <div class="input-group">
-              <input type="text" name="query" id="search-query" class="form-control border-0 rounded-pill" placeholder="Search users..." aria-label="Search users">
-              <button type="submit" class="btn btn-outline-primary rounded-pill ms-2">Search</button>
-            </div>
-          </form>
-        </li>
 
         <!-- User Account Dropdown -->
         <li class="nav-item dropdown">
@@ -46,6 +75,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item" href="view-profile?id=<?=$_SESSION['id']?>">Profile</a></li>
+            <li><a class="dropdown-item" href="my-posts">Your Posts</a></li>
             <li><a class="dropdown-item" href="settings">Settings</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="logout">Log out</a></li>

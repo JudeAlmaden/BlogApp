@@ -19,8 +19,8 @@ class BlogModel {
     function uploadBlog($user_id, $title, $content, $status, $scheduled_at) {
         $conn = $this->connect(); // Assuming you have a method that returns the DB connection
 
-        $query = "INSERT INTO blog_posts (user_id, title, content, status, scheduled_at, created_at, updated_at) 
-                VALUES (:user_id, :title, :content, :status, :scheduled_at, NOW(), NOW())";
+        $query = "INSERT INTO blog_posts (user_id, title, content, status, scheduled_at,published_at, created_at, updated_at) 
+                VALUES (:user_id, :title, :content, :status, :scheduled_at,NOW(), NOW(), NOW())";
 
         try {
             $stmt = $conn->prepare($query);
@@ -114,19 +114,25 @@ class BlogModel {
                 users on blog_posts.user_id = users.id
             WHERE 
                 (blog_posts.status = 'published'
-                OR (blog_posts.scheduled_at > '0000-00-00 00:00:00' AND blog_posts.scheduled_at < NOW()))
+                OR (blog_posts.scheduled_at > '0000-00-00 00:00:00' AND blog_posts.scheduled_at < NOW())
+                OR (blog_posts.user_id = ?)
+                )
                 AND blog_posts.id = ?
             GROUP BY 
                 blog_posts.id";
-
+        
             // Prepare the query
             $stmt = $conn->prepare($query);
             if (!$stmt) {
                 return ["error" => "Query preparation failed."];
             }
-
-            // Bind the ID parameter and execute the query
-            $stmt->execute([$id]);
+        
+            // Bind the parameters
+            $stmt->bindValue(1, $_SESSION['id'], PDO::PARAM_INT); // Assuming user_id is an integer
+            $stmt->bindValue(2, $id, PDO::PARAM_INT); // Assuming blog_posts.id is an integer
+        
+            // Execute the query
+            $stmt->execute();
 
             // Fetch the result
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -158,7 +164,9 @@ class BlogModel {
                 blog_posts.status,
                 blog_posts.created_at,
                 blog_posts.likes,
+                blog_posts.published_at,
                 users.name,
+                users.profile_image as profile,
                 GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name) AS all_tags,
                 GROUP_CONCAT(DISTINCT categories.name ORDER BY categories.name) AS all_categories,
                 (
@@ -259,7 +267,7 @@ class BlogModel {
         }
     
         // Map sortBy to corresponding column
-        $sortColumn = $sortBy === 'date' ? 'blog_posts.created_at' : ($sortBy === 'updated' ? 'blog_posts.updated_at' : 'blog_posts.likes');
+        $sortColumn = $sortBy === 'date' ? 'blog_posts.published_at' : ($sortBy === 'updated' ? 'blog_posts.published_at' : 'blog_posts.likes');
     
         // Add ORDER BY clause
         $query .= " ORDER BY $sortColumn $sortOrder";
@@ -289,7 +297,7 @@ class BlogModel {
     
             // SQL query to update scheduled posts
             $query = "UPDATE blog_posts
-                      SET status = 'published'
+                      SET status = 'published', published_at = blog_posts.scheduled_at
                       WHERE blog_posts.scheduled_at > '0000-00-00 00:00:00'
                       AND blog_posts.scheduled_at < NOW();";
     
@@ -310,60 +318,60 @@ class BlogModel {
     }
     
     // //All Posts where The user is the user
-    // public function isAuthor($user_id, $post_id) {
-    //     try{
-    //         $conn = $this->connect();
+    public function isAuthor($user_id, $post_id) {
+        try{
+            $conn = $this->connect();
 
-    //         $query = "
-    //         SELECT 
-    //             blog_posts.*,
-    //             users.name as author,
-    //             users.id as user_id,
-    //             GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name) AS all_tags,
-    //             GROUP_CONCAT(DISTINCT categories.name ORDER BY categories.name) AS all_categories,
-    //             GROUP_CONCAT(DISTINCT blog_post_media.file_Path ORDER BY blog_post_media.id) as media_url
-    //         FROM 
-    //             blog_posts
-    //         LEFT JOIN 
-    //             blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
-    //         LEFT JOIN 
-    //             tags ON tags.id = blog_post_tags.tag_id
-    //         LEFT JOIN 
-    //             blog_post_category ON blog_posts.id = blog_post_category.blog_post_id
-    //         LEFT JOIN 
-    //             categories ON categories.id = blog_post_category.category_id
-    //         LEFT JOIN
-    //             blog_post_media on blog_posts.id = blog_post_media.blog_post_id
-    //         LEFT JOIN
-    //             users on blog_posts.user_id = users.id
-    //         WHERE 
-    //             users.id = ? AND blog_posts.id = ?
-    //         GROUP BY 
-    //             blog_posts.id";
+            $query = "
+            SELECT 
+                blog_posts.*,
+                users.name as author,
+                users.id as user_id,
+                GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name) AS all_tags,
+                GROUP_CONCAT(DISTINCT categories.name ORDER BY categories.name) AS all_categories,
+                GROUP_CONCAT(DISTINCT blog_post_media.file_Path ORDER BY blog_post_media.id) as media_url
+            FROM 
+                blog_posts
+            LEFT JOIN 
+                blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+            LEFT JOIN 
+                tags ON tags.id = blog_post_tags.tag_id
+            LEFT JOIN 
+                blog_post_category ON blog_posts.id = blog_post_category.blog_post_id
+            LEFT JOIN 
+                categories ON categories.id = blog_post_category.category_id
+            LEFT JOIN
+                blog_post_media on blog_posts.id = blog_post_media.blog_post_id
+            LEFT JOIN
+                users on blog_posts.user_id = users.id
+            WHERE 
+                users.id = ? AND blog_posts.id = ?
+            GROUP BY 
+                blog_posts.id";
 
-    //         // Prepare the query
-    //         $stmt = $conn->prepare($query);
-    //         if (!$stmt) {
-    //             return ["error" => "Query preparation failed."];
-    //         }
+            // Prepare the query
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                return ["error" => "Query preparation failed."];
+            }
 
-    //         // Bind the ID parameter and execute the query
-    //         $stmt->execute([$user_id,$post_id]);
+            // Bind the ID parameter and execute the query
+            $stmt->execute([$user_id,$post_id]);
 
-    //         // Fetch the result
-    //         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Fetch the result
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    //         // Check if the blog post exists
-    //         if ($result) {
-    //             return $result;
-    //         } else {
-    //             return ["error" => "Blog post not found."];
-    //         }
-    //     }catch (PDOException $e) {
-    //         // Handle exceptions
-    //         return ["success" => false, "message" => "Error: " . $e->getMessage()];
-    //     }
-    // }
+            // Check if the blog post exists
+            if ($result) {
+                return $result;
+            } else {
+                return ["error" => "Blog post not found."];
+            }
+        }catch (PDOException $e) {
+            // Handle exceptions
+            return ["success" => false, "message" => "Error: " . $e->getMessage()];
+        }
+    }
     
     public function deletePost($user_id,$post_id){
         try {

@@ -30,7 +30,7 @@ class CategoriesModel {
     $conn = $this->connect();
 
     // Adjust query to use LIKE with placeholders
-    $query = "SELECT * FROM categories WHERE name LIKE :name LIMIT 5";  // Use a placeholder for the name
+    $query = "SELECT * FROM categories WHERE name LIKE :name LIMIT 7";  // Use a placeholder for the name
 
     // Prepare the query
     $stmt = $conn->prepare($query);

@@ -1,10 +1,10 @@
 <?php
     if(!isset($_SESSION['id'])){
-        header('login');
+        header('location:login');
         exit;
+
     }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

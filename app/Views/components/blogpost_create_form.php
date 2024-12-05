@@ -1,69 +1,111 @@
 <div class="container py-5">
-    <h1 class="text-center mb-4">Create Blog Post</h1>
-    <form id="category-form" action="create-post" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+    <form id="category-form" action="create-post" method="POST" enctype="multipart/form-data" class="card p-5 shadow-lg border-0 rounded-4">
+    <h1 class="text-center mb-5" style="font-size: 2.5rem; font-weight: bold; color: #333;">Create Blog Post</h1>        
         <!-- Title Field -->
         <div class="mb-4">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter post title" required>
+            <label for="title" class="form-label fw-semibold" style="font-size: 1.1rem;">Post Title</label>
+            <input 
+                type="text" 
+                class="form-control shadow-sm" 
+                id="title" 
+                name="title" 
+                placeholder="Enter your post title here" 
+                required 
+                maxlength="100" 
+                style="font-size: 1rem; border-radius: 10px;">
         </div>
 
         <!-- Content Field -->
         <div class="mb-4">
-            <label for="content" class="form-label">Content</label>
-            <textarea class="form-control" id="content" name="content" rows="6" placeholder="Write your content here..." required></textarea>
+            <label for="content" class="form-label fw-semibold" style="font-size: 1.1rem;">Post Content</label>
+            <textarea 
+                class="form-control shadow-sm" 
+                id="content" 
+                name="content" 
+                rows="8" 
+                placeholder="Write your content here..." 
+                required
+                style="font-size: 1rem; border-radius: 10px;"></textarea>
         </div>
 
         <!-- Category Selection -->
         <div class="mb-4">
-            <label for="category-search" class="form-label">Category</label>
-            <input type="text" class="form-control" id="category-search" placeholder="Search for a category" autocomplete="off">
-            <ul id="category-list" class="list-group mt-2"></ul>
-            <div class="mt-1" style="font-size:10px">
-                <span class="fw-bold">Selected Categories:</span>
-                <div id="categories-list" class="mt-2"></div>
+            <label for="category-search" class="form-label fw-semibold" style="font-size: 1.1rem;">Select Categories</label>
+            <input 
+                type="text" 
+                class="form-control shadow-sm" 
+                id="category-search" 
+                placeholder="Search and add categories" 
+                autocomplete="off"
+                style="font-size: 1rem; border-radius: 10px;">
+            <ul id="category-list" class="list-group mt-2 shadow-sm"></ul>
+            <div class="mt-3">
+                <strong>Selected Categories:</strong>
+                <div id="categories-list" class="mt-2 badge-container"></div>
             </div>
         </div>
 
         <!-- Tags Selection -->
         <div class="mb-4">
-            <label for="tags-search" class="form-label">Tags</label>
-            <input type="text" class="form-control" id="tags-search" placeholder="Search for a tag" autocomplete="off">
-            <ul id="tag-list" class="list-group mt-2"></ul>
-            <div class="mt-1" style="font-size:10px"></div>
-                <span class="fw-bold" style="font-size:10px">Selected Tags:</span>
-            <div id="tags-list" class="mt-2"></div>
+            <label for="tags-search" class="form-label fw-semibold" style="font-size: 1.1rem;">Add Tags</label>
+            <input 
+                type="text" 
+                class="form-control shadow-sm" 
+                id="tags-search" 
+                placeholder="Search and add tags" 
+                autocomplete="off"
+                style="font-size: 1rem; border-radius: 10px;">
+            <ul id="tag-list" class="list-group mt-2 shadow-sm"></ul>
+            <div class="mt-3">
+                <strong>Selected Tags:</strong>
+                <div id="tags-list" class="mt-2 badge-container"></div>
+            </div>
         </div>
 
         <!-- Media Upload -->
         <div class="mb-4">
-            <label for="media" class="form-label">Upload Media (Reupload on next edit)</label>
-            <input type="file" class="form-control" id="media" name="media[]" accept="image/*,video/*,audio/*" multiple>
-            <small class="text-muted">You can upload images, videos, or audio files.</small>
+            <label for="media" class="form-label fw-semibold" style="font-size: 1.1rem;">Upload Media</label>
+            <input 
+                type="file" 
+                class="form-control shadow-sm" 
+                id="media" 
+                name="media[]" 
+                accept="image/*,video/*,audio/*" 
+                multiple
+                style="font-size: 1rem; border-radius: 10px;">
+            <small class="text-muted">You can upload images, videos, or audio files. These will need to be reuploaded if editing.</small>
             <div id="media-preview" class="row mt-3 gy-3">
-                <!-- Previews will appear here -->
+                <!-- Media previews will appear here -->
             </div>
         </div>
 
         <!-- Scheduled Date for Publication -->
         <div class="mb-4">
-            <label for="scheduled_at" class="form-label">Schedule for Publication</label>
-            <input type="datetime-local" class="form-control" id="scheduled_at" name="scheduled_at">
+            <label for="scheduled_at" class="form-label fw-semibold" style="font-size: 1.1rem;">Schedule Post</label>
+            <input 
+                type="datetime-local" 
+                class="form-control shadow-sm" 
+                id="scheduled_at" 
+                name="scheduled_at"
+                style="font-size: 1rem; border-radius: 10px;">
         </div>
 
-        <!-- Hidden Fields -->
-        <div id="selected-categories-tags">
+        <!-- Hidden Fields for Categories and Tags -->
+        <div id="selected-categories-tags" class="d-none">
             <input type="hidden" name="categories[]" id="categories-input">
             <input type="hidden" name="tags[]" id="tags-input">
         </div>
 
         <!-- Submit Buttons -->
-        <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-primary" name="action" value="save">Save Post</button>
-            <button type="submit" class="btn btn-success" name="action" value="publish">Publish Post</button>
+        <div class="d-flex justify-content-end gap-3 mt-4">
+            <button type="submit" class="btn btn-outline-primary shadow-sm px-4 py-2" name="action" value="save" style="border-radius: 20px; font-weight: bold; transition: all 0.3s;">Save as Draft</button>
+            <button type="submit" class="btn btn-success shadow-sm px-4 py-2" name="action" value="publish" style="border-radius: 20px; font-weight: bold; transition: all 0.3s;">Publish</button>
         </div>
 
-        <div class="d-flex justify-content-end gap-2">
-            <small>Tags,Categories, And uploads will not be saved</small>
+        <!-- Disclaimer -->
+        <div class="mt-3 text-muted text-end">
+            <small><em>Note: Categories, tags, and uploads will not be saved until the post is published or saved as a draft.</em></small>
         </div>
     </form>
 </div>

@@ -1,7 +1,8 @@
 <?php
     if(!isset($_SESSION['id'])){
-        header('login');
+        header('location:login');
         exit;
+
     }
 ?>
 
@@ -24,10 +25,13 @@
 <body>
 <div class="container-fluid">
     <?php require_once(__DIR__."/../components/navbar.php");?>
+    <div class="row my-3" style="min-height:100vh; max-height:50vh">
+        
     <?php require_once(__DIR__."/../components/blogpost_create_form.php");?>
     <?php require_once(__DIR__ . "/../components/footer.php"); ?>
     <?php require_once(__DIR__ . "/../view_error.php"); ?>
     <?php require_once(__DIR__ . "/../view_success.php"); ?>
+    </div>
 </div>
 </body>
 </html>

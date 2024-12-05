@@ -67,7 +67,7 @@ class TagsModel {
       $conn = $this->connect();
       
       // Prepare the SQL query to insert a new record into the pivot table 'post_tags'
-      $query = "DELETE FROM  blog_post_tag WHERE blog_post_id = :id";
+      $query = "DELETE FROM  blog_post_tags WHERE blog_post_id = :id";
       $stmt = $conn->prepare($query);
 
       // Bind the parameters and execute the statement

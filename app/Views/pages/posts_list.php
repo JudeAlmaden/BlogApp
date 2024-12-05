@@ -1,9 +1,9 @@
 <?php
-// Check if user is logged in, otherwise redirect to login
-if (!isset($_SESSION['id'])) {
-    header('Location: login');
-    exit;
-}
+    if(!isset($_SESSION['id'])){
+        header('location:login');
+        exit;
+
+    }
 ?>
 
 <!DOCTYPE html>

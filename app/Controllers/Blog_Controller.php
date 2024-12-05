@@ -10,8 +10,8 @@ class BlogController extends Controller{
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 1. Sanitize Input Data
             $title = htmlspecialchars(trim($_POST['title'] ?? ''));
-            $content = htmlspecialchars(trim($_POST['content'] ?? ''));
-            $categories = json_decode($_POST['categories'][0] ?? '[]', true);
+            $content = htmlspecialchars(trim($_POST['content'] ?? ''));             //This will take the iD
+            $categories = json_decode($_POST['categories'][0] ?? '[]', true);   //This will take the id
             $tags = json_decode($_POST['tags'][0] ?? '[]', true);
             $scheduled_at = $_POST['scheduled_at'] ?? null;
             $user_id = $_SESSION['id'];
@@ -343,8 +343,6 @@ class BlogController extends Controller{
         $post_id = $_GET['id'];
         $user_id = $_SESSION['id'] ?? null;
         $isAdmin = false;
-
-
         
         if (!$post_id || !$user_id || !is_numeric($user_id)||!is_numeric($post_id)) {
             $_SESSION['errors'] = ['Invalid post or user'];
@@ -412,14 +410,6 @@ class BlogController extends Controller{
 
                 if (empty($content)) {
                     $errors[] = 'Content is required.';
-                }
-
-                if (empty($categories) || !is_array($categories)) {
-                    $errors[] = 'At least one category must be selected.';
-                }
-
-                if (empty($tags) || !is_array($tags)) {
-                    $errors[] = 'At least one tag must be selected.';
                 }
 
                 if (!empty($scheduled_at) && !strtotime($scheduled_at)) {
@@ -524,22 +514,28 @@ class BlogController extends Controller{
 
                     $blogsModel->updateBlog($post_id,$user_id,$title,$content,$status,$scheduled_at);
                     
-                    //Delete existing associations
-                    $tagsModel->deleteByBlogId($post_id);
-                    $mediaModel->deleteByBlogId($post_id);
-                    $categoriesModel->deleteByBlogId($post_id);
-
-                    foreach($tags as $tag){
-                        $tagsModel->insertBlogPostTags($post_id,$tag['id']);
-                    }
-                    foreach($categories as $category){
-                        $categoriesModel->insertBlogPostCategories($post_id,$category['id']);
-                    }
-                    foreach($media_files as $media_file){
-                        $mediaModel->insertBlogPostMedia($post_id,$media_file['path'],$media_file['type']);
+                    // Delete operations only if the arrays are not empty
+                    if (!empty($tags)) {               
+                        $tagsModel->deleteByBlogId($post_id);
+                        foreach ($tags as $tag) {
+                            $tagsModel->insertBlogPostTags($post_id, $tag['id']);
+                        }
                     }
 
-                    ///
+                    if (!empty($categories)) {
+                        $categoriesModel->deleteByBlogId($post_id);
+                        foreach ($categories as $category) {
+                            $categoriesModel->insertBlogPostCategories($post_id, $category['id']);
+                        }
+                    }
+
+                    if (!empty($media_files)) {
+                        $mediaModel->deleteByBlogId($post_id);
+                        foreach ($media_files as $media_file) {
+                            $mediaModel->insertBlogPostMedia($post_id, $media_file['path'], $media_file['type']);
+                        }
+                    }
+
                     $_SESSION['success'] = ["Success"];
                     header('location:homepage');
                     exit;
@@ -560,7 +556,7 @@ class BlogController extends Controller{
             }
         
             $blogsModel = new BlogModel();
-            $post = $blogsModel->isUserAuthor($user_id, $post_id);
+            $post = $blogsModel->isAuthor($user_id, $post_id);
         
             // If the user is the author and the post exists, render the edit view
             if ($post) {

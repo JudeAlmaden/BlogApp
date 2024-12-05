@@ -1,7 +1,8 @@
 <?php
     if(!isset($_SESSION['id'])){
-        header('login');
+        header('location:login');
         exit;
+
     }
 ?>
 

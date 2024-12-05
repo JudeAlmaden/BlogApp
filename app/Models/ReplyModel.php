@@ -88,7 +88,7 @@ class ReplyModel {
 
   public function deleteReply($reply_id){
     try {
-        $conn = $this->connect(); // Assuming you have a method that returns the DB connection       
+        $conn = $this->connect();
         $query = "
             DELETE FROM replies 
             WHERE replies.id = :reply_id";
@@ -101,7 +101,7 @@ class ReplyModel {
         
         return false;
     } catch (PDOException $e) {
-        return "Error: " . $e->getMessage(); // Handle query error
+        return "Error: " . $e->getMessage();
 
     }
 }

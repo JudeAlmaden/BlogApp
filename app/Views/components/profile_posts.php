@@ -1,8 +1,18 @@
-<div class="col-md-9 mb-5 p-5">
-    <div class="text-center fs-1"><?php echo htmlspecialchars($user['name']); ?>'s Posts</div>
-    <div id="results"></div>
-</div>
+<div class="col-md-9 p-5">
+<div class= "p-4 rounded-3 shadow-lg bg-light">
+    <!-- Section Title -->
+    <div class="text-center mb-4">
+        <h1 class="fs-2 fw-bold text-primary" style="text-transform: capitalize;">
+            <?php echo htmlspecialchars($user['name']); ?>'s Posts
+        </h1>
+    </div>
 
+    <!-- Results Container -->
+    <div id="results" class="pt-4">
+
+    </div>
+</div>
+</div>
 
 <script>
 $(document).ready(function () {
