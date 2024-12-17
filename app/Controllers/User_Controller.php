@@ -178,7 +178,6 @@ class UserController extends Controller{
                     // Move the uploaded file to the directory
                     if (move_uploaded_file($fileTmpPath, $uploadPath)) {
                         $avatar = $uploadPath;
-                        $actualPath = "http://localhost/IntegrativeProgramming/finals/BlogWebApp/".$uploadPath ;
                     } else {
                         $errors[] = 'There was an error uploading your avatar.';
                     }

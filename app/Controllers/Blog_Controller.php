@@ -125,7 +125,7 @@ class BlogController extends Controller{
                         if (move_uploaded_file($tmp_name, $target_path)) {
                             // Store the relative file path and mapped type for the uploaded file
                             $media_files[] = [
-                                'path' =>"http://localhost/IntegrativeProgramming/finals/BlogWebApp/".$relative_file_path, // Use the relative path here
+                                'path' =>$relative_file_path, // Use the relative path here
                                 'type' => $mapped_type // Insert the mapped type here
                             ];
                         } else {
@@ -387,6 +387,11 @@ class BlogController extends Controller{
                 $max_size = 30 * 1024 * 1024;  // 100MB in bytes
                 $max_files = 20;  // Maximum number of files
 
+                $blogsModel = new BlogModel();
+                $tagsModel = new TagsModel();
+                $mediaModel = new MediaModel();
+                $categoriesModel = new CategoriesModel();
+                
                 // Map the status based on the button clicked
                 if ($status === 'save') {
                     $status = 'draft'; // Status for "Save Post"
@@ -420,6 +425,11 @@ class BlogController extends Controller{
                     $errors[] = "You can upload a maximum of $max_files files.";
                 }
 
+                if (isset($_POST['remove_media']) && $_POST['remove_media'] == 1) {
+
+                    $mediaModel->deleteByBlogId($post_id);
+                }
+
                 //Handling files
                 if (!empty($_FILES['media']['name'][0]) && empty($errors)) {
                     // Define the relative path for media uploads
@@ -433,7 +443,9 @@ class BlogController extends Controller{
                     // Initialize fileinfo resource for MIME type detection
                     $finfo = finfo_open(FILEINFO_MIME_TYPE); // Open fileinfo resource for MIME type detection
                     
-
+                    
+                    // Handle new file uploads if any
+ 
                     foreach ($_FILES['media']['tmp_name'] as $key => $tmp_name) {
                         $file_name = basename($_FILES['media']['name'][$key]);
                         $file_size = $_FILES['media']['size'][$key];
@@ -495,6 +507,7 @@ class BlogController extends Controller{
                         } else {
                             $errors[] = 'Unsupported file type: ' . $file_name;
                         }
+                        
                     }
 
                     // Close fileinfo resource after use
@@ -506,11 +519,6 @@ class BlogController extends Controller{
                     $this->view('pages/create_post', ['errors'=>$errors]);
                     exit;
                 } else {
-                    // Upload the post
-                    $blogsModel = new BlogModel();
-                    $tagsModel = new TagsModel();
-                    $mediaModel = new MediaModel();
-                    $categoriesModel = new CategoriesModel();
 
                     $blogsModel->updateBlog($post_id,$user_id,$title,$content,$status,$scheduled_at);
                     

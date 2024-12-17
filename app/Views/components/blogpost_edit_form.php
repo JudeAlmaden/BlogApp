@@ -38,86 +38,58 @@
             <div id="tags-list" class="mt-2"></div>
         </div>
 
-        <!-- Media Upload -->
-        <div class="mb-4">
-            <label for="media" class="form-label">Upload Media (Reupload on next edit)</label>
-            <input type="file" class="form-control" id="media" name="media[]" accept="image/*,video/*,audio/*" multiple>
-            <small class="text-muted">You can upload images, videos, or audio files.</small>
-            <div id="media-preview" class="row mt-3 gy-3">
-                <?php if (!empty($post['media_url'])): ?>
-                <!-- Carousel Container -->
-                    <div id="imageCarouselContainer">
-                        <div id="imageCarousel" class="carousel carousel-dark slide mb-4" data-bs-ride="carousel">
-                            <div class="carousel-inner">
-                                <?php
-                                    $images = explode(',', $post['media_url']);
-                                    $first = true; // To handle the first image active class
-                                    foreach ($images as $image): 
-                                ?>
-                                    <div class="carousel-item <?php echo $first ? 'active' : ''; ?>">
-                                        <!-- Image Thumbnail with height limit of 400px and centered -->
-                                        <img src="<?php echo htmlspecialchars($image); ?>" 
-                                            class="d-block w-100 img-fluid rounded mb-3 thumbnail-image" 
-                                            alt="Image"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#imageModal"
-                                            style="max-height: 400px; object-fit: contain; cursor: pointer;">
-                                    </div>
-                                    <?php 
-                                        $first = false;
-                                    endforeach; 
-                                ?>
-                            </div>
-                            <!-- Carousel Controls -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
+    <!-- Media Upload -->
+    <div class="mb-4">
+        <label for="media" class="form-label">Upload Media (Reupload on next edit)</label>
+        <input type="file" class="form-control" id="media" name="media[]" accept="image/*,video/*,audio/*" multiple>
+        <small class="text-muted">You can upload images, videos, or audio files.</small>
 
-                        <!-- Modal for Displaying Larger Image -->
-                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="imageModalLabel">Image View</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <img id="modal-image" src="" alt="Large Image" class="img-fluid">
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <script>
-                    // JavaScript to update the modal image source when a thumbnail is clicked
-                    const thumbnailImages = document.querySelectorAll('.thumbnail-image');
-                    thumbnailImages.forEach(image => {
-                        image.addEventListener('click', function () {
-                            const imageSrc = this.src; // Get the clicked image source
-                            document.getElementById('modal-image').src = imageSrc; // Set the modal image source
-                        });
-                    });
-
-                    // JavaScript to remove the carousel when files are selected
-                    document.getElementById('media').addEventListener('change', function () {
-                        const carouselContainer = document.getElementById('imageCarouselContainer');
-                        if (carouselContainer) {
-                            carouselContainer.remove(); // Remove the existing carousel
-                        }
-                    });
-                </script>
-                <?php endif; ?>
-            </div>
+        <!-- Option to Remove Media -->
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="remove-media" name="remove_media" value="1">
+            <label class="form-check-label" for="remove-media">Don't use any photo</label>
         </div>
+
+        <!-- Media Preview -->
+        <div id="media-preview" class="row mt-3 gy-3">
+            <?php if (!empty($post['media_url'])): ?>
+                <!-- Carousel Container -->
+                <div id="imageCarouselContainer">
+                    <div id="imageCarousel" class="carousel carousel-dark slide mb-4" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <?php
+                                $images = explode(',', $post['media_url']);
+                                $first = true;
+                                foreach ($images as $image): 
+                            ?>
+                                <div class="carousel-item <?php echo $first ? 'active' : ''; ?>">
+                                    <img src="<?php echo htmlspecialchars($image); ?>" 
+                                        class="d-block w-100 img-fluid rounded mb-3 thumbnail-image" 
+                                        alt="Image"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#imageModal"
+                                        style="max-height: 400px; object-fit: contain; cursor: pointer;">
+                                </div>
+                            <?php 
+                                $first = false;
+                                endforeach; 
+                            ?>
+                        </div>
+                        <!-- Carousel Controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
 
         <!-- Scheduled Date for Publication -->
         <div class="mb-4">

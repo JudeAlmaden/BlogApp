@@ -221,7 +221,7 @@ $(document).ready(function () {
                                             
                                             <!-- Read More Button -->
                                             <a href="view?id=${item.id}" class="btn btn-outline-primary btn-sm" 
-                                            target="_blank" rel="noopener noreferrer" 
+                                            target="_blank" 
                                             style="font-weight: bold; padding: 5px 15px; border-radius: 20px; transition: all 0.3s;">
                                                 Read More
                                             </a>

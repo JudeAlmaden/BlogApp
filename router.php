@@ -1,7 +1,23 @@
 <?php
 class Router {
     private $routes = [];
-    private $base_url = '/IntegrativeProgramming/finals/BlogWebApp'; // Set base URL
+    private $base_url;
+
+    public function __construct() {
+        // Remove the absolute document root and leave a clean relative path
+        $script_path = str_replace('\\', '/', __DIR__); // Normalize slashes for Windows/Linux compatibility
+        $document_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+        $relative_path = str_replace($document_root, '', $script_path);
+    
+        // Ensure the relative path starts clean
+        $relative_path = ltrim($relative_path, '/');
+    
+        $this->base_url = "/".$relative_path ;
+    }
+
+    public function getBaseUrl() {
+        return $this->base_url;
+    }
 
     // Add a route
     public function addRoute($url, $controller, $method, $requestMethod) {
@@ -28,6 +44,9 @@ class Router {
                 return;
             }
         }
+
+        echo $this->base_url;
+        exit;
 
         // If no route matches
         echo'

@@ -422,8 +422,6 @@ class BlogModel {
             return false; // Return false on failure to ensure safety.
         }
     }
-    
-    
 
     public function toggleLike($user_id, $post_id) {
         try {
@@ -492,7 +490,6 @@ class BlogModel {
         }
     }
     
-
     public function likedByUser($user_id, $post_id) {
         try {
             // Establish a connection to the database
