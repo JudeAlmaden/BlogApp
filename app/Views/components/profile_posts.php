@@ -84,7 +84,7 @@ $(document).ready(function () {
                                                 <p class="card-text my-0"><small>Tags: ${item.all_tags}</small></p>
                                                 <p class="card-text my-0"><small>Categories: ${item.all_categories}</small></p>
                                                 <div class="d-flex justify-content-end">
-                                                    <a href="view?id=${item.id}" class="btn btn-primary col-3" target="_blank" rel="noopener noreferrer">Read</a>
+                                                    <a href="view?id=${item.id}" class="btn btn-primary col-3" target="_blank" >Read</a>
                                                 </div>
                                             </div>
                                         </div>

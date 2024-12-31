@@ -21,11 +21,20 @@
 <body>
     <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="card p-4 shadow-lg" style="width: 400px;">
-            <div class="text-center">
-                <div class="logo mb-3">
-                    <img src="https://www.freepnglogos.com/uploads/logo-chatgpt-png/chatgpt-brand-logo-transparent.png" alt="LogoLangz" class="img-fluid" style="width: 100px;">
-                </div>
-                <h3 class="mb-3">Generic Website</h3>
+            <div class="d-flex flex-column justify-content-center align-items-center  text-center">
+                <a
+                    class="navbar-brand fw-bold fs-3 d-flex align-items-center"
+                    href="homepage"
+                    style="font-family: 'Poppins', sans-serif; color: #2C3E50;">
+                    <span
+                        class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-3"
+                        style="width: 50px; height: 50px; font-size: 1.5rem;">
+                        WS
+                    </span>
+                    <span>
+                        Write<span class="text-primary">Sphere</span>
+                    </span>
+                </a>
             </div>
             <form action="login" method="POST" class="mt-3">
                 <!-- Email Field -->

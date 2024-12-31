@@ -184,9 +184,7 @@ class UserController extends Controller{
                 }
             }
 
-
             $userModel = new UserModel();
-
 
             // Check if there are any errors
             if (empty($errors) &&   $userModel->updateProfile($id, $name, $bio, $gender, $avatar)) {

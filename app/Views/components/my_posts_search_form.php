@@ -346,13 +346,13 @@ $(document).ready(function () {
                                                     </small>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
-                                                    <a href="view?id=${item.id}" class="btn btn-primary btn-m d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer">
+                                                    <a href="view?id=${item.id}" class="btn btn-primary btn-m d-flex align-items-center justify-content-center" target="_blank" r>
                                                         Read
                                                     </a>
                                                     <a href="delete-post?id=${item.id}" class="btn btn-danger btn-m d-flex align-items-center justify-content-center" target="_blank">
                                                         <i class="fas fa-trash me-1"></i> Delete
                                                     </a>
-                                                    <a href="edit-post?id=${item.id}" class="btn btn-success btn-m d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer">
+                                                    <a href="edit-post?id=${item.id}" class="btn btn-success btn-m d-flex align-items-center justify-content-center" target="_blank" >
                                                         <i class="fas fa-edit me-1"></i> Edit
                                                     </a>
                                                 </div>
