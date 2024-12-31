@@ -27,7 +27,6 @@ class ReplyController extends Controller
         }
     }
 
-
     public function getReplies() {
         // Retrieve the post_id and index from the GET request
         $comment_id = isset($_GET['comment_id']) ? $_GET['comment_id'] : null;

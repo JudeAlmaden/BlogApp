@@ -111,11 +111,10 @@ class UserController extends Controller{
         exit;
     }
 
-    function updateProfile(){
+    function updateProfile(){    
+        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Initialize an array to store potential errors
-            $errors = [];
-        
             $id = isset($_SESSION['id']) ? htmlspecialchars(trim($_SESSION['id'])) : '';
             if (empty($id)) {
                 $errors[] = 'You are not logged in';
@@ -142,8 +141,6 @@ class UserController extends Controller{
             }
         
             // Sanitize and validate the avatar (file upload)
-            $avatar = null;
-
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
                 $fileTmpPath = $_FILES['avatar']['tmp_name'];
                 $fileName = $_FILES['avatar']['name'];
@@ -159,8 +156,8 @@ class UserController extends Controller{
                 }
         
                 // Check file size (max 2MB for example)
-                if ($fileSize > 2 * 1024 * 1024) { // 2MB
-                    $errors[] = 'Avatar image size exceeds the limit of 2MB.';
+                if ($fileSize > 5 * 1024 * 1024) { // 2MB
+                    $errors[] = 'Avatar image size exceeds the limit of 5MB.';
                 }
         
                 // If no errors, move the uploaded file to the desired directory
@@ -185,16 +182,14 @@ class UserController extends Controller{
             }
 
             $userModel = new UserModel();
-
+            $_SESSION['errors'] = $errors;
+            
             // Check if there are any errors
             if (empty($errors) &&   $userModel->updateProfile($id, $name, $bio, $gender, $avatar)) {
                 $_SESSION['success'] = ["Profile updated Sucessfully"];
 
                 return header("location:settings");
             } else {
-                // Display errors
-                $errors = "An error has occured";
-                $_SESSION['errors'] = $errors;
                 return header("location:settings");
             }
         }

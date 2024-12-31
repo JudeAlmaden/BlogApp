@@ -339,6 +339,7 @@ class BlogController extends Controller{
         echo json_encode($results); // Send results as JSON
     }
     
+    // For viewing a blog post
     public function readPost() {
         $post_id = $_GET['id'];
         $user_id = $_SESSION['id'] ?? null;
@@ -371,6 +372,7 @@ class BlogController extends Controller{
         }
     }
     
+    //Editing post, checks if the user is the author before updating
     public function editPost() {
         // Retrieve user and post IDs
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -578,6 +580,7 @@ class BlogController extends Controller{
         }
     }
     
+    // Deletes a post based on its ID
     public function deletePost(){
         $post_id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
         $user_id = $_SESSION['id'];
@@ -613,6 +616,7 @@ class BlogController extends Controller{
         }
     }
 
+    //API Route to like a post, toggles status to like or unlike and sends json response
     public function likePost() {
         // Retrieve post_id from the GET request and user_id from the session
         $post_id = isset($_GET['post_id']) ? htmlspecialchars($_GET['post_id'], ENT_QUOTES) : '';

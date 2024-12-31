@@ -35,14 +35,15 @@
             <div class="mb-3">
                   
                 <!-- Avatar Preview -->
-                <div id="avatar-preview-container" class="d-flex justify-content-center align-items-center">
+                <div id="avatar-preview-container" class="d-flex justify-content-center align-items-center flex-column">
 
                     <?php if (isset($data['user']['profile_image']) && !empty($data['user']['profile_image'])): ?>
                         <!-- Avatar image if already set -->
-                        <img src="<?php echo $data['user']['profile_image']; ?>" alt="Profile Image" class="img-fluid mt-2 rounded-circle" id="avatar-preview" style="width: 150px; height: 150px; object-fit: cover;">
+                        <div class="col-12 text-center">Current Profile Image</div>
+                        <img src="<?php echo $data['user']['profile_image']; ?>" alt="Profile Image" class="img-fluid col-12 mt-2 rounded-circle" id="avatar-preview" style="width: 150px; height: 150px; object-fit: cover;">
                     <?php else: ?>
                         <!-- Placeholder if no avatar is set -->
-                        <div>No profile image set.</div>
+                        <div class="col-12 text-center">No profile image set Currently</div>
                     <?php endif; ?>
                 </div>
 
@@ -55,35 +56,6 @@
         </form>
     </div>
 </div>
-
-<script>
-    // Function to preview image when selected
-    function previewImage(event) {
-        var reader = new FileReader();
-
-        reader.onload = function() {
-            var preview = document.getElementById('avatar-preview');
-            preview.src = reader.result;  // Set the image source to the selected file
-            preview.style.display = 'block';  // Ensure the preview is shown
-            preview.style.objectFit = 'cover';  // Crop the image to fit the circle
-        };
-
-        // If no previous preview exists, create one
-        if (!document.getElementById('avatar-preview')) {
-            var previewContainer = document.getElementById('avatar-preview-container');
-            var newImage = document.createElement('img');
-            newImage.id = 'avatar-preview';
-            newImage.className = 'img-fluid mt-2 rounded-circle';
-            newImage.style.width = '150px';
-            newImage.style.height = '150px';
-            newImage.style.objectFit = 'cover';  // Crop the image to fit the circle
-            previewContainer.appendChild(newImage);
-        }
-
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
-
 
     <!-- Change Email Section -->
     <div class="card mb-4">
@@ -141,3 +113,36 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Function to preview image when selected
+    function previewImage(event) {
+        var reader = new FileReader();
+
+        reader.onload = function() {
+            var preview = document.getElementById('avatar-preview');
+            preview.src = reader.result;  // Set the image source to the selected file
+            preview.style.display = 'block';  // Ensure the preview is shown
+            preview.style.objectFit = 'cover';  // Crop the image to fit the circle
+        };
+
+        // If no previous preview exists, create one
+        if (!document.getElementById('avatar-preview')) {
+            var previewContainer = document.getElementById('avatar-preview-container');
+            var newImage = document.createElement('img');
+            newImage.id = 'avatar-preview';
+            newImage.className = 'img-fluid mt-2 rounded-circle';
+            newImage.style.width = '150px';
+            newImage.style.height = '150px';
+            newImage.style.objectFit = 'cover';  // Crop the image to fit the circle
+
+            var div = document.createElement('div');
+            div.className = 'col-12 text-center';
+            div.textContent = 'New Profile Image';
+            previewContainer.appendChild(div);
+            previewContainer.appendChild(newImage);
+        }
+
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>

@@ -149,7 +149,8 @@ class BlogModel {
         }
     }
 
-    public function filteredSearch($keyword = "%", $categories = [], $tags = [], $date_from = null, $date_to = null, $offset = 0, $limit = 20, $sortBy = "date", $sortOrder = "desc", $status = "%", $user_id = null, $isAdmin = false, $author = "%") {
+    public function filteredSearch($keyword = "%", $categories = [], $tags = [], $date_from = null, $date_to = null, $offset = 0, 
+    $limit = 20, $sortBy = "date", $sortOrder = "desc", $status = "%", $user_id = null, $isAdmin = false, $author = "%") {
         $conn = $this->connect();
         $this->publishScheduledPost(); // Ensure scheduled posts are published
         $offset = $offset * $limit; // Calculate offset

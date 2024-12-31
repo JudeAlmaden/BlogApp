@@ -59,7 +59,6 @@ class CommentController extends Controller
             echo json_encode(['status' => 'error', 'message' => 'No comments found for this post']);
         }
     }
-
     public function deleteComment(){
         $comment_id = isset($_GET['id']) ? htmlspecialchars($_GET['id'], ENT_QUOTES) : '';
         $post_id = isset($_GET['post_id']) ? htmlspecialchars($_GET['post_id'], ENT_QUOTES) : '';

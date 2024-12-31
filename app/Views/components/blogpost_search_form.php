@@ -119,7 +119,7 @@
 </div>
 <div class="col-md-8 border-start">
     <div class="content-section p-4">
-        <h2 class="text-center fw-bold mb-4">Your Blog Posts</h2>
+        <h2 class="text-center fw-bold mb-4">Results</h2>
 
         <!-- Display Posts -->
         <div id="results" class="row gy-4 px-2">
@@ -323,7 +323,7 @@ $(document).ready(function () {
                             <div class="row g-0">
                                 <!-- Left Column: Post Image (only if there's an image) -->
                                 ${imagePath ? `
-                                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                                <div class="col-12 d-flex justify-content-center align-items-center">
                                     <img src="${imagePath}" class="img-fluid rounded-start" alt="Post Thumbnail" 
                                         style="width: 100%; height: 250px; object-fit: cover;">
                                 </div>

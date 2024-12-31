@@ -178,7 +178,6 @@ $(document).ready(function() {
                                     <div class="d-flex align-items-center mb-3">
                                         <!-- User Avatar -->
                                         <img src="${comment.profile_image || 'https://via.placeholder.com/50'}" alt="User Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-                                        
                                         <!-- User Info -->
                                         <div>
                                             <h6 class="mb-0">${comment.name}</h6>
