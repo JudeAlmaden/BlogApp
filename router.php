@@ -33,20 +33,19 @@ class Router {
     public function dispatch($requestUri, $requestMethod) {
         // Remove the query string from the URL for comparison
         $urlWithoutQuery = strtok($requestUri, '?');
-
+    
         foreach ($this->routes as $route) {
             // Compare base URL + route with the URL without query parameters
             $routeUrl = $this->base_url . $route['url'];
-
-            // Check if the URL matches the request URI and method
-            if ($urlWithoutQuery === $routeUrl && strtoupper($requestMethod) === $route['requestMethod']) {
+    
+            // Check if the URL matches the request URI (case-insensitively) and method
+            if (strcasecmp($urlWithoutQuery, $routeUrl) === 0 && strtoupper($requestMethod) === strtoupper($route['requestMethod'])) {
                 $this->callControllerMethod($route['controller'], $route['method']);
                 return;
             }
         }
-
-        echo $this->base_url;
-        exit;
+    
+    
 
         // If no route matches
         echo'

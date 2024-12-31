@@ -2,12 +2,12 @@
     RewriteEngine On
 
     # RewriteBase if your project is in a subdirectory
-    RewriteBase /IntegrativeProgramming/finals/BlogWebApp/
+    RewriteBase /BlogWebApp/
 
     # Exclude /public/ and subdirectories from rewrite
-    RewriteCond %{REQUEST_URI} ^/IntegrativeProgramming/finals/BlogWebApp/public/
-    RewriteCond %{REQUEST_URI} !^/IntegrativeProgramming/finals/BlogWebApp/public/uploads/
-    RewriteCond %{REQUEST_URI} !^/IntegrativeProgramming/finals/BlogWebApp/public/uploads/media
+    RewriteCond %{REQUEST_URI} ^/BlogWebApp/public/
+    RewriteCond %{REQUEST_URI} !^/BlogWebApp/public/uploads/
+    RewriteCond %{REQUEST_URI} !^/BlogWebApp/public/uploads/media
     RewriteRule ^ - [L]
 
     # Exclude static files (like images, CSS, JS) from being routed through index.php
