@@ -2,7 +2,7 @@
     RewriteEngine On
 
     # RewriteBase if your project is in a subdirectory
-    RewriteBase /BlogWebApp/
+    RewriteBase /BlogApp/
 
     # Exclude /public/ and subdirectories from rewrite
     RewriteCond %{REQUEST_URI} ^/BlogWebApp/public/
