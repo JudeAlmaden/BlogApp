@@ -133,7 +133,7 @@ class Router {
                 <div class="error-code">404</div>
                 <h1>Oops! Page Not Found</h1>
                 <p>Sorry, the page you are looking for does not exist or has been moved.</p>
-                <a href="http://localhost/IntegrativeProgramming/finals/BlogWebApp/" class="home-btn">Go Back to Home</a>
+                <a href="http://localhost/WriteSphere/" class="home-btn">Go Back to Home</a>
             </div>
 
         </body>

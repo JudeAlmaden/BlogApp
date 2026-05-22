@@ -94,7 +94,6 @@ $(document).ready(function () {
     let offset = 0;
     let reachedEnd = false;
     let isQuerying = false;
-    const today = new Date().toISOString().split('T')[0];
 
     // Reusable AJAX query function
     function fetchSearchResults() {
@@ -103,11 +102,11 @@ $(document).ready(function () {
             author: "",
             category: null,
             tags: null,
-            date_from: today,
+            date_from: null,
             date_to: null,
-            sort_by: "like",
+            sort_by: "likes",
             sort_order: "desc",
-            offset: offset // Include offset in the form data
+            offset: offset
         };
 
         if (!reachedEnd && !isQuerying) {
@@ -194,7 +193,8 @@ $(document).ready(function () {
                                             <!-- Author -->
                                             <div class="d-flex align-items-center">
                                                 <img src="${profileImage}" class="rounded-circle" alt="Profile" 
-                                                    style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                                    style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;"
+                                                    onerror="this.src='https://i.pinimg.com/originals/c0/27/be/c027bec07c2dc08b9df60921dfd539bd.webp'">
                                                 <a href="view-profile?id=${item.user_id}" 
                                                 style="text-decoration: none; font-weight: bold; color: #007bff;">
                                                     ${item.name}

@@ -205,7 +205,7 @@ class BlogController extends Controller{
 
         $blogsModel = new BlogModel();
         $results = $blogsModel->filteredSearch($keyword, $categories, $tags, $date_from, $date_to, 
-        $offset,$limit,$sortBy,$sortOrder,"Published",$user_id,false);
+        $offset,$limit,$sortBy,$sortOrder,"published",$user_id,false);
     
         header('Content-Type: application/json');
         echo json_encode($results);  // Send results as JSON
@@ -500,7 +500,7 @@ class BlogController extends Controller{
                             if (move_uploaded_file($tmp_name, $target_path)) {
                                 // Store the relative file path and mapped type for the uploaded file
                                 $media_files[] = [
-                                    'path' =>"http://localhost/IntegrativeProgramming/finals/BlogWebApp/".$relative_file_path, // Use the relative path here
+                                    'path' =>"http://localhost/WriteSphere/".$relative_file_path, // Use the relative path here
                                     'type' => $mapped_type // Insert the mapped type here
                                 ];
                             } else {

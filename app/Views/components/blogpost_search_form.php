@@ -150,7 +150,7 @@ $(document).ready(function () {
     function searchCategories(query) {
         $('#category-list').empty();
         $.ajax({
-            url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/categories/search?search=' + query,
+            url: 'api/get/categories/search?search=' + query,
             method: 'GET',
             dataType: 'json',
             success: function (data) {
@@ -215,7 +215,7 @@ $(document).ready(function () {
     function searchTags(query) {
         $('#tag-list').empty();
         $.ajax({
-            url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/tags/search?search=' + query,
+            url: 'api/get/tags/search?search=' + query,
             method: 'GET',
             dataType: 'json',
             success: function (data) {
@@ -348,7 +348,8 @@ $(document).ready(function () {
                                             <!-- Author -->
                                             <div class="d-flex align-items-center">
                                                 <img src="${profileImage}" class="rounded-circle" alt="Profile" 
-                                                    style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                                    style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;"
+                                                    onerror="this.src='https://i.pinimg.com/originals/c0/27/be/c027bec07c2dc08b9df60921dfd539bd.webp'">
                                                 <a href="view-profile?id=${item.user_id}" 
                                                 style="text-decoration: none; font-weight: bold; color: #007bff;">
                                                     ${item.name}

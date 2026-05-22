@@ -114,7 +114,7 @@ class BlogModel {
                 users on blog_posts.user_id = users.id
             WHERE 
                 (blog_posts.status = 'published'
-                OR (blog_posts.scheduled_at > '0000-00-00 00:00:00' AND blog_posts.scheduled_at < NOW())
+                OR (blog_posts.scheduled_at IS NOT NULL AND blog_posts.scheduled_at < NOW())
                 OR (blog_posts.user_id = ?)
                 )
                 AND blog_posts.id = ?
@@ -205,13 +205,13 @@ class BlogModel {
             $conditions[] = "(users.id = ?)";
             $params[] = $user_id;
         }
-        if (!empty($author)) {
+        if (!empty($author) && $author !== "%") {
             $conditions[] = "(users.name LIKE ?)";
             $params[] = "%".$author."%";
         }
     
         if (!$isAdmin) {
-            $conditions[] = "(blog_posts.status = 'published' OR (blog_posts.scheduled_at > '0000-00-00 00:00:00' AND blog_posts.scheduled_at < NOW()))";
+            $conditions[] = "(blog_posts.status = 'published' OR (blog_posts.scheduled_at IS NOT NULL AND blog_posts.scheduled_at < NOW()))";
         }
     
         if (!empty($status)) {
@@ -284,10 +284,10 @@ class BlogModel {
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 return $result;
             } catch (PDOException $e) {
-                return ["error" => $e->getMessage()];
+                return [];
             }
         } else {
-            return ["error" => "Query preparation failed."];
+            return [];
         }
     }
 
@@ -299,7 +299,7 @@ class BlogModel {
             // SQL query to update scheduled posts
             $query = "UPDATE blog_posts
                       SET status = 'published', published_at = blog_posts.scheduled_at
-                      WHERE blog_posts.scheduled_at > '0000-00-00 00:00:00'
+                      WHERE blog_posts.scheduled_at IS NOT NULL
                       AND blog_posts.scheduled_at < NOW();";
     
             // Prepare and execute the query

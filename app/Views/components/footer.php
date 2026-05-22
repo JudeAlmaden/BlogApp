@@ -9,7 +9,7 @@
       </div>
       <div class="col-md-4">
         <h5>Contact Information</h5>
-        <p>Email: support@blogapp.com</p>
+        <p>Email: support@writesphere.com</p>
         <p>Phone: +123-456-7890</p>
         <p>Address: 123 Blog Avenue, Content City</p>
       </div>
@@ -21,7 +21,7 @@
     </div>
     <hr class="my-3">
     <div class="text-center">
-      <p>&copy; 2024 BlogApp. All Rights Reserved.</p>
+      <p>&copy; 2024 WriteSphere. All Rights Reserved.</p>
     </div>
   </div>
 </footer>

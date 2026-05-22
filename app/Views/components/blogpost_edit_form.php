@@ -135,7 +135,7 @@ $(document).ready(function() {
     function searchCategories(query) {
         $('#category-list').empty();
         $.ajax({
-            url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/categories/search?search=' + query,
+            url: 'api/get/categories/search?search=' + query,
             method: 'GET',
             dataType: 'json',
             success: function(data) {
@@ -202,7 +202,7 @@ $(document).ready(function() {
     function searchTags(query) {
         $('#tag-list').empty();
         $.ajax({
-            url: 'http://localhost/IntegrativeProgramming/finals/BlogWebApp/api/get/tags/search?search=' + query,
+            url: 'api/get/tags/search?search=' + query,
             method: 'GET',
             dataType: 'json',
             success: function(data) {
